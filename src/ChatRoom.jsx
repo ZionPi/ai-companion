@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 import "./index.css";
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-
+import remarkGfm from 'remark-gfm'
 function ChatRoom() {
     const [message, setMessage] = useState('');
     const [answer, setAnswer] = useState('');
 
     const CodeBlock = ({ language, value }) => {
-    return (
-        <div style={{ position: 'relative' }}>
-        <SyntaxHighlighter style={dark} language={language}>
-            {value}
-        </SyntaxHighlighter>
-        <CopyToClipboard text={value}>
-            <button style={{ position: 'absolute', right: '5px', top: '5px' }}>
-            Copy
-            </button>
-        </CopyToClipboard>
-        </div>
-    );
+        return (
+            <div style={{ position: 'relative' }}>
+                <SyntaxHighlighter style={dark} language={language}>
+                    {value}
+                </SyntaxHighlighter>
+                <CopyToClipboard text={value}>
+                    <button style={{ position: 'absolute', right: '8px', top: '5px' }}>
+                        Copy
+                    </button>
+                </CopyToClipboard>
+            </div>
+        );
     };
 
 
@@ -89,7 +89,7 @@ function ChatRoom() {
             <div className='ml-4  w-16 h-7 px-1.5 py-0.5  bg-cyan-100 rounded-lg' >聊天页</div>
             <div className='mt-0'>
                 <textarea
-                    className='mx-4 w-full h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
+                    className='mx-4 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
                     id='question_box'
                     placeholder="输入聊天内容"
                     value={message}
@@ -106,8 +106,41 @@ function ChatRoom() {
                     onChange={(e) => setAnswer(e.target.value)}
                 ></textarea> */}
 
-                <ReactMarkdown components={{ code: CodeBlock }} className=" mt-2 mx-4 w-full resize-none md:text-1xl h-250 pl-2 pt-2 rounded-lg outline-none border-gray-200 align-top shadow-sm overflow-auto  ">{answer}</ReactMarkdown>
+                {/* <ReactMarkdown components={{ code: CodeBlock }} className=" mt-2 mx-4 w-full resize-none md:text-1xl h-250 pl-2 pt-2 rounded-lg outline-none border-gray-200 align-top shadow-sm overflow-auto  ">{answer}</ReactMarkdown> */}
 
+
+                <Markdown
+                    remarkPlugins={[remarkGfm]}
+                    className="bg-orange-100 mt-2 mx-4 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
+                    children={answer}
+                    components={{
+                        code(props) {
+                            const { children, className, node, ...rest } = props
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                                <div style={{ position: 'relative' }}>
+                                    <SyntaxHighlighter
+                                        {...rest}
+                                        PreTag="div"
+                                        children={String(children).replace(/\n$/, '')}
+                                        language={match[1]}
+                                        style={dark}
+                                    />
+                                    <CopyToClipboard text={String(children).replace(/\n$/, '')}>
+                                        <button style={{ position: 'absolute', right: '10px', top: '5px', color: '#ffffff' }}>
+                                            Copy
+                                        </button>
+                                    </CopyToClipboard>
+                                </div>
+
+                            ) : (
+                                <code {...rest} className={className}>
+                                    {children}
+                                </code>
+                            )
+                        }
+                    }}
+                />
 
             </div>
             <div className=''>

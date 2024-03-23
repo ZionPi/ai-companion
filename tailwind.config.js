@@ -11,6 +11,9 @@ export default {
           '250': '250px',
           '300': '300px',
         },
+        minHeight: {
+          '250': '250px',
+        },
 
           width: {
           '100': '58rem',
