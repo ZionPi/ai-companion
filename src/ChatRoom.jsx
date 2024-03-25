@@ -5,32 +5,40 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import remarkGfm from 'remark-gfm'
+import LoadingComponent from './Loading';
+import AlertComponent from './AlertComponent';
+
 function ChatRoom() {
     const [message, setMessage] = useState('');
     const [answer, setAnswer] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMsg, setAlertMsg] = useState('');
 
-    const CodeBlock = ({ language, value }) => {
-        return (
-            <div style={{ position: 'relative' }}>
-                <SyntaxHighlighter style={dark} language={language}>
-                    {value}
-                </SyntaxHighlighter>
-                <CopyToClipboard text={value}>
-                    <button style={{ position: 'absolute', right: '8px', top: '5px' }}>
-                        Copy
-                    </button>
-                </CopyToClipboard>
-            </div>
-        );
-    };
-
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const target_service = 'http://127.0.0.1:7077/v1/chat/completions';
 
+      // 处理KeyDown事件
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // 防止Enter默认行为
+            ask(); // 如果没有按Shift，调用ask函数发送消息
+        } else if (e.key === 'Enter' && e.shiftKey) {
+            // 如果同时按下Shift和Enter，允许换行
+            setMessage(message);
+        }
+    }
+
+
     async function ask() {
         try {
-            console.log("message", message);
+            if(message === "") {
+                setShowAlert(true);    
+                setAlertMsg("输入框为空");
+                return ;
+            }
+            // setMessage("");
+            setIsLoading(true);
             fetch(target_service, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -51,11 +59,13 @@ function ChatRoom() {
                 reader.read().then(function processText({ done, value }) {
                     if (done) {
                         console.log('Stream complete');
+                        setIsLoading(false);
                         return;
                     }
                     const jsonString = new TextDecoder().decode(value);
                     if (jsonString.trim() === 'data: [DONE]') {
                         console.log('Stream complete');
+                        setIsLoading(false);
                     } else if (jsonString.startsWith('data:')) {
                         try {
                             const json = JSON.parse(jsonString.substring(6));
@@ -66,6 +76,7 @@ function ChatRoom() {
                             console.log(jsonString);
                         } catch (e) {
                             console.log('Error parsing JSON:', e);
+
                         }
                     }
 
@@ -73,45 +84,65 @@ function ChatRoom() {
                 });
             }).catch(error => {
                 console.error(error);
+
             });
 
 
         } catch (error) {
             console.error('There was an error!', error);
+
         }
     }
 
     return (
-        <div className='flex flex-col justify-center w-100' >
-            <h1 className='text-4xl font-bold text-orange-500'>Let's build something cool.</h1>
+        <div className='flex flex-col w-full mx-10 relative' >
+            <div className='flex items-center justify-center '>
+                <AlertComponent message={alertMsg} isVisible={showAlert} />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 bg-indigo-600 px-4 py-3 text-white">
+                {/* <p className="text-sm font-medium">
+                    Love Alpine JS?
+                    <a href="#" className="inline-block underline">Check out this new course!</a>
+                </p> */}
+
+                <h1 className='text-1xl font-medium text-lime-200'>Free software is not free beers.</h1>
+
+                <button
+                    aria-label="Dismiss"
+                    className="shrink-0 rounded-lg bg-black/10 p-1 transition hover:bg-black/20"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                </button>
+            </div>
+           
 
             {/* <span className="ml-4 mb-2 w-10 h-5  whitespace-nowrap rounded-full bg-purple-100  text-purple-700"> Live </span> */}
-            <div className='ml-4  w-16 h-7 px-1.5 py-0.5  bg-cyan-100 rounded-lg' >聊天页</div>
-            <div className='mt-0'>
-                <textarea
-                    className='mx-4 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
-                    id='question_box'
-                    placeholder="输入聊天内容"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                ></textarea>
-            </div>
+            {/* <div className='ml-4  w-16 h-7 px-1.5 py-0.5  bg-cyan-100 rounded-lg' >聊天页</div> */}
+
+
+            <span
+                className="mt-2 w-20 h-7 inline-flex items-center justify-center rounded-lg  bg-cyan-100 px-2.5 py-0.5 text-purple-700"
+            >
+                <svg  data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+                </svg>
+
+                <p className="whitespace-nowrap text-sm">聊天页</p>
+            </span>
+
+
             <div className=''>
-                {/* <textarea
-                    id='answer_box'
-                    className="mt-2 mx-4 w-full resize-none md:text-1xl h-250 pl-2 pt-2 rounded-lg outline-none border-gray-200 align-top shadow-sm overflow-auto  bg-green-200 "
-                    rows="4"
-                    placeholder="回复的内容"
-                    value={answer} // 绑定answer状态到textarea
-                    onChange={(e) => setAnswer(e.target.value)}
-                ></textarea> */}
-
-                {/* <ReactMarkdown components={{ code: CodeBlock }} className=" mt-2 mx-4 w-full resize-none md:text-1xl h-250 pl-2 pt-2 rounded-lg outline-none border-gray-200 align-top shadow-sm overflow-auto  ">{answer}</ReactMarkdown> */}
-
 
                 <Markdown
                     remarkPlugins={[remarkGfm]}
-                    className="bg-orange-100 mt-2 mx-4 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
+                    className="bg-orange-100 mt-1 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
                     children={answer}
                     components={{
                         code(props) {
@@ -143,8 +174,26 @@ function ChatRoom() {
                 />
 
             </div>
-            <div className=''>
-                <button className="ml-4 mt-5 w-20  h-10 hover:bg-red-300" onClick={ask}>确定</button>
+
+
+            <LoadingComponent isLoading={isLoading} />
+
+            <div className='mt-0'>
+                <textarea
+                    className='mt-1 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
+                    id='question_box'
+                    placeholder="输入聊天内容"
+                    value={message}
+                    onKeyDown={handleKeyDown} 
+                    onChange={(e) => setMessage(e.target.value)}
+                ></textarea>
+            </div>
+
+
+
+
+            <div className='flex justify-end  mb-5' >
+                <button className="mt-1 w-20  h-10 hover:bg-red-300" onClick={ask}>发送</button>
             </div>
 
 
