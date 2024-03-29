@@ -1,0 +1,13 @@
+{
+    "service_url": "http://127.0.0.1:7077/v1/chat/completions",
+    "message_list_key": "message_list",
+    "user_name": "zionpi",
+    "user_img_url": "https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_960_720.png",
+    "model_name" : "coze",
+    "model_img_url": "https://cdn.pixabay.com/photo/2016/03/31/20/31/amazed-1295833_960_720.png",
+
+    "chat_mode" : {
+        "lead_clause": "AI Companion",
+        "is_online": " online "
+    }
+}

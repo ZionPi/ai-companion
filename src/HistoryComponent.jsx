@@ -1,38 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState ,useContext} from 'react';
 import "./index.css";
 import ListItem from './ListItem';
-// Sample data
-const dataList = [
-    { id: 1, role: "user", name: 'Apple', desc: 'A sweet red fruit', imgUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60' },
-    { id: 2, role: "user", name: 'Banana', desc: 'A long yellow fruit', imgUrl: 'banana.jpg' },
-    { id: 3, role: "user", name: 'Cherry', desc: 'A small round stone fruit', imgUrl: 'cherry.jpg' },
-    { id: 4, role: "ai", name: 'Date', desc: 'A sweet brown fruit', imgUrl: 'date.jpg' },
-    { id: 5, role: "user", name: 'Elderberry', desc: 'A dark purple berry', imgUrl: 'elderberry.jpg' },
-    { id: 6, role: "user", name: 'Fig', desc: 'A pear-shaped tropical fruit', imgUrl: 'fig.jpg' },
-    { id: 7, role: "ai", name: 'Grape', desc: 'A small juicy fruit', imgUrl: 'grape.jpg' },
-    { id: 8, role: "user", name: 'Honeydew', desc: 'A sweet melon', imgUrl: 'honeydew.jpg' },
-    { id: 9, role: "user", name: 'Kiwi', desc: 'A small fruit with green flesh', imgUrl: 'kiwi.jpg' },
-    { id: 10, role: "ai", name: 'Lemon', desc: 'A sour yellow citrus fruit', imgUrl: 'lemon.jpg' },
-    { id: 11, role: "user", name: 'Mango', desc: 'A tropical stone fruit', imgUrl: 'mango.jpg' },
-    { id: 12, role: "ai", name: 'Nectarine', desc: 'A smooth-skinned peach', imgUrl: 'nectarine.jpg' }
-
-    // ... other items
-];
+import { useSelector, useDispatch } from 'react-redux';
 
 function HistoryComponent() {
+
+     const messageList = useSelector(state => state.messages.messageList);
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState(dataList);
+    const [searchResults, setSearchResults] = useState(messageList);
+
 
     const handleChange = event => {
         const value = event.target.value;
         setSearchTerm(value);
         if (value !== '') {
-            setSearchResults(dataList.filter(item =>
+            setSearchResults(messageList.filter(item =>
                 item.name.toLowerCase().includes(value.toLowerCase()) ||
                 item.desc.toLowerCase().includes(value.toLowerCase())
             ));
         } else {
-            setSearchResults(dataList);
+            setSearchResults(messageList);
         }
     };
 
@@ -47,7 +35,7 @@ function HistoryComponent() {
                     value={searchTerm}
                     onChange={handleChange}
                 />
-                <svg className='absolute right-3 w-5 h-5' dataSlot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <svg className='absolute right-3 w-5 h-5' fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
             </div>

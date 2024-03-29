@@ -7,6 +7,8 @@ import RandomizeComponent from './RandomizeComponent'
 import AccountComponent from './AccountComponent'
 import LogoutComponent from './LogoutComponent'
 import { useState } from "react";
+import Timeline from "./Timeline";
+import LandingPage from "./LandingPage";
 
 function MainFrame() {
 
@@ -25,7 +27,7 @@ function MainFrame() {
             case "account":
                 return <AccountComponent />;
             case "logout":
-                return <LogoutComponent />;
+                return <LandingPage />;
             default:
                 break;
         }

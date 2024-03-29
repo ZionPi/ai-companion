@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./index.css";
-
 import ChatComponent from './ChatComponent';
 import SingleComponent from './SingleComponent';
 import ErrorComponent from './ErrorComponent';
+import OnlineStatusIndicator from './OnlineStatusIndicator';
 
 function ConversationComponent() {
 
-    const [viewMode,setViewMode] = useState('single');
-    const [modeTitle,setModeTitle] = useState('搜寻');
+    const [viewMode, setViewMode] = useState('single');
+    const [modeTitle, setModeTitle] = useState('搜寻');
 
     const quote = "Free software is not free beer. It is a matter of liberty ,not price."
 
@@ -26,6 +26,39 @@ function ConversationComponent() {
 
     }
 
+    function scrollToBottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function scrollToTop() {
+        window.scrollTo(0, 0);
+    }
+
+
+
+    useEffect(() => {
+        function handleKeyDown(e) {
+            if (e.metaKey && e.key === 'x') {
+                toggleMode();
+                scrollToTop();
+            }
+            if (e.metaKey && e.key === '9') {
+                scrollToBottom();
+            }
+            if (e.metaKey && e.key === '0') {
+                scrollToTop();
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup the event listener on component unmount
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [viewMode]); // Re-run the effect when `viewMode` changes
+
+
 
     function renderContent() {
         switch (viewMode) {
@@ -37,7 +70,7 @@ function ConversationComponent() {
                 return <ErrorComponent />;
         }
     }
-    
+
 
     return (
         <div className='flex flex-col w-full mx-10 relative' >
@@ -63,7 +96,7 @@ function ConversationComponent() {
                     </svg>
                 </button>
             </div>
-           
+
 
             {/* <span className="ml-4 mb-2 w-10 h-5  whitespace-nowrap rounded-full bg-purple-100  text-purple-700"> Live </span> */}
             {/* <div className='ml-4  w-16 h-7 px-1.5 py-0.5  bg-cyan-100 rounded-lg' >聊天页</div> */}
@@ -77,10 +110,12 @@ function ConversationComponent() {
                     </svg>
 
                     <p className="whitespace-nowrap text-sm">{modeTitle}</p>
+
                 </span>
+                <OnlineStatusIndicator />
             </a>
-     
-           <div>{renderContent()}</div>
+
+            <div>{renderContent()}</div>
 
         </div>
     );
