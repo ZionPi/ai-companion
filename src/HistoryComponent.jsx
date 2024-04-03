@@ -44,11 +44,11 @@ function HistoryComponent() {
     };
 
     return (
-        <div className='flex flex-col w-full mx-4 items-center bg-white'>
+        <div className='flex flex-col w-full  mx-4 items-center bg-white'>
 
             <div className='relative flex items-center m-4'>
                 <input
-                    className='pl-3 w-[1040px] h-12 '
+                    className='pl-3 w-full md:w-[750px] h-12 '
                     type="text"
                     placeholder="Search..."
                     value={searchTerm}
@@ -85,9 +85,7 @@ function HistoryComponent() {
                 </button>
             </div>
 
-
-
-            <ul className='w-4/5  mt-5 '>
+            <ul className='w-4/5 md:w-4/5  mt-5 '>
                 {searchResults.map(item => (
                     <li className='m-3' key={item.id}>
                         <ListItem item={item} />

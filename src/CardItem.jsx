@@ -51,7 +51,7 @@ const markdownStyle = {
             whileHover={{ scale: 1.1 }}
         >
 
-            <div className=" bg-amber-300 flex flex-col justify-center w-[400px] h-[600px] rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2.5 
+            <div className=" bg-amber-300 flex flex-col justify-center w-[200px] h-[300px] md:w-[400px] md:h-[600px] rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2.5 
             border-1
              border-amber-400 border-opacity-50">
                 {!imageUrl  && (<textarea ref={textAreaRef}
