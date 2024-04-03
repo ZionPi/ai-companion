@@ -1,17 +1,21 @@
 import { useEffect } from "react";
 import { useState } from "react";
 
-const AlertComponent = ({ message, isVisible ,onDismiss}) => {
+const AlertComponent = ({ message, isVisible, onDismiss }) => {
 
     const [show, setShow] = useState(isVisible);
 
-    useEffect(()=> {
-        setShow(isVisible);
-    },[isVisible]);
+    useEffect(() => {
+        if (isVisible) {
+            setShow(true);
+        }
+    }, [isVisible]);
+
+
 
     const handleDismiss = () => {
         setShow(false);
-        if(onDismiss) onDismiss();
+        if (onDismiss) onDismiss();
     };
 
     if (!show) return null;

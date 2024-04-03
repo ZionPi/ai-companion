@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./index.css";
+import configData from './data/config.json';
 
 function NavigatorComponent({ onLinkClick }) {
     const [activePage, setActivePage] = useState("conversation");
@@ -35,7 +36,7 @@ function NavigatorComponent({ onLinkClick }) {
         <div>
             <div className="inline-flex size-16 items-center justify-center">
                 <span className="grid size-10 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
-                    zionpi
+                    {configData.user_name}
                 </span>
             </div>
 

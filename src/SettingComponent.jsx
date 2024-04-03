@@ -1,10 +1,29 @@
+import { useState } from "react";
+import configData from './data/config.json';
 function SettingComponent() {
+
+
+
+    const [serverAddress, setServerAddress] = useState(configData.service_url);
+
+    const [secretKey, setSecretKey] = useState(configData.secret_key);
+
+    const save_config = () => {
+        console.log('serverAddress', serverAddress);
+
+        console.log('secretKey', secretKey);
+    };
+
+    const reset_config = () => {
+
+    };
+
     return (
         <div className="w-full">
             <div className="flex items-center justify-center p-12">
 
                 <div className="mx-auto w-full max-w-[550px]">
-                    <form action="#" method="POST">
+                    <div >
                         <div className="-mx-3 flex flex-wrap">
                             <div className="w-full px-3 sm:w-3/4">
                                 <div className="mb-5">
@@ -19,6 +38,7 @@ function SettingComponent() {
                                         name="fName"
                                         id="fName"
                                         placeholder="127.0.0.1"
+                                        onChange={(e) => setServerAddress(e.target.value)}
                                         className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
@@ -36,6 +56,7 @@ function SettingComponent() {
                                         name="lName"
                                         id="lName"
                                         placeholder="xxxx"
+                                        onChange={(e) => setSecretKey(e.target.value)}
                                         className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
@@ -96,7 +117,7 @@ function SettingComponent() {
                             />
                         </div>
 
-                        <div className="-mx-3 flex flex-wrap">
+                        <div className="-mx-3 flex flex-wrap hidden">
                             <div className="w-full px-3 sm:w-1/2">
                                 <div className="mb-5">
                                     <label
@@ -131,16 +152,25 @@ function SettingComponent() {
                             </div>
                         </div>
 
-                        
+
 
                         <div className="flex justify-end ">
+
+                            <button
+                                className="mr-5 hover:shadow-form rounded-md bg-[#c6bfa1] py-3 px-8 text-center text-base font-semibold text-white outline-none"
+                                onClick={reset_config}
+                            >
+                                重置
+                            </button>
+
                             <button
                                 className="hover:shadow-form rounded-md bg-[#c6bfa1] py-3 px-8 text-center text-base font-semibold text-white outline-none"
+                                onClick={save_config}
                             >
                                 保存
                             </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
 

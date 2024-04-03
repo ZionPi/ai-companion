@@ -8,14 +8,16 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import remarkGfm from 'remark-gfm'
 import InputBox from './InputBox';
 import { useSelector } from 'react-redux';
+import LoadingComponent from './Loading';
 
 function SingleComponent() {
 
-    const answer = useSelector((state) => state.answer.answer);
+    const answer = useSelector((state) => state.answer.value);
+    const isLoading = useSelector((state) => state.answer.isLoading);
 
     return (
         <>
-
+            <LoadingComponent isLoading={isLoading} />
             <Markdown
                 remarkPlugins={[remarkGfm]}
                 className="bg-orange-100 mt-1 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
@@ -48,6 +50,7 @@ function SingleComponent() {
                     }
                 }}
             />
+             
 
 
 
