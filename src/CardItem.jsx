@@ -1,45 +1,71 @@
-function CardItem() {
-    return (<a href="#" className="group relative block h-64 sm:h-80 lg:h-96">
-            <span className="absolute inset-0 border-2 border-dashed border-black"></span>
+import React, { useRef, useEffect } from 'react';
+import Markdown from 'markdown-to-jsx'
+import { motion } from 'framer-motion';
 
-            <div
-                className="relative flex h-full transform items-end border-2 border-black bg-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2"
-            >
-                <div
-                    className="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8"
+function CardItem({ item }) {
+    const textAreaRef = useRef(null);
+
+    const containsCode = (markdownText) => {
+        const inlineCodeRegex = /`[^`]+`/; // Matches inline code
+        const blockCodeRegex = /```[\s\S]*?```/; // Matches block code
+
+        const hasInlineCode = inlineCodeRegex.test(markdownText);
+        const hasBlockCode = blockCodeRegex.test(markdownText);
+
+        return hasInlineCode || hasBlockCode; // Returns true if either inline or block code is found
+    };
+
+    const extractImageUrl = (markdownText) => {
+        const imageRegex = /!\[.*?\]\((.*?)\)/; // Regex to match Markdown image syntax
+        const matches = markdownText.match(imageRegex);
+        return matches ? matches[1] : null; // Return the URL or null if no image syntax is found
+    };
+
+
+    const imageUrl = extractImageUrl(item.desc);
+
+    const hasCode = containsCode(item.desc);
+
+    useEffect(() => {
+        if (textAreaRef.current) {
+            const maxHeight = 600; // Maximum height of the parent container
+            textAreaRef.current.style.height = '0px'; // Reset height to recalculate
+            const scrollHeight = textAreaRef.current.scrollHeight;
+            textAreaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
+        }
+    }, [item.desc]); // Dependency array ensures effect runs whenever item.desc changes
+
+    // Define your CSS to apply to the Markdown component
+const markdownStyle = {
+  code: {
+    whiteSpace: 'pre-wrap', // Allows code to wrap inside <code> blocks
+  },
+  pre: {
+    whiteSpace: 'pre-wrap', // Allows code to wrap inside <pre> blocks
+    wordBreak: 'break-word', // Breaks long words if necessary
+  },
+};
+
+    return (
+        <motion.div
+            whileHover={{ scale: 1.1 }}
+        >
+
+            <div className=" bg-amber-300 flex flex-col justify-center w-[400px] h-[600px] rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2.5 
+            border-1
+             border-amber-400 border-opacity-50">
+                {!imageUrl  && (<textarea ref={textAreaRef}
+                    className=" bg-amber-300 outline-none resize-none overflow-auto mx-2 my-3 text-2xl"
+                    value={item.desc}
+                    readOnly
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="size-10 sm:size-12"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
+                </textarea>)}
+                {(imageUrl  ) && (<Markdown options={{ overrides: markdownStyle }} className="mx-2 my-3 text-2xl">{item.desc}</Markdown>)}
 
-                    <h2 className="mt-4 text-xl font-medium sm:text-2xl">Go around the world</h2>
-                </div>
-
-                <div
-                    className="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
-                >
-                    <h3 className="mt-4 text-xl font-medium sm:text-2xl">Go around the world</h3>
-
-                    <p className="mt-4 text-sm sm:text-base">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem
-                        omnis atque culpa repellendus.
-                    </p>
-
-                    <p className="mt-8 font-bold">Read more</p>
-                </div>
             </div>
-        </a>);
+        </motion.div>
+
+    );
 }
 
 export default CardItem;
