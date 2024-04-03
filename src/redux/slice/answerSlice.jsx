@@ -75,7 +75,7 @@ export const api = createApi({
               const { done, value } = await reader.read();
               if (done) break;
               const rawJsonString = new TextDecoder().decode(value);
-              const dataStringList = rawJsonString.split("data:");
+              const dataStringList = rawJsonString.split("data:");//this is may not be correct if the response has the data: 
               for (let i = 1; i < dataStringList.length; i++) {
                 const c = dataStringList[i];
                 if (c.trim() === '[DONE]') {
@@ -85,7 +85,12 @@ export const api = createApi({
                 }
                 try {
                   const json = JSON.parse(c);
-                  content = json.choices[0].message.content;
+                  if (configData.service_url.includes("8080")) {
+                    content += json.choices[0].delta.content;
+                  } else if (configData.service_url.includes("7077")) {
+                    content = json.choices[0].message.content;
+                  }
+
                   dispatch(updateSingleItem({id:system_msg_id,desc: content,isLoading:true}));
                   dispatch(setContent({isLoading:true,value:content}));
                 } catch (e) {

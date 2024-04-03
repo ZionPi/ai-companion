@@ -1,14 +1,33 @@
-import React, { useState ,useContext} from 'react';
+import React, { useState, useContext } from 'react';
 import "./index.css";
 import ListItem from './ListItem';
 import { useSelector, useDispatch } from 'react-redux';
 
 function HistoryComponent() {
 
-     const messageList = useSelector(state => state.messages.messageList);
+    const messageList = useSelector(state => state.messages.messageList);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState(messageList);
+
+    const [activeTab, setActiveTab] = useState('全部');
+
+    const handleButtonClick = (tab) => {
+        console.log(`选中了: ${tab}`);
+        setActiveTab(tab);
+        if(tab == '全部') {
+            setSearchResults(messageList);
+        } else if(tab == "问题") {
+            setSearchResults(messageList.filter(item =>
+                item.role.toLowerCase().includes("user") 
+            ));
+
+        } else if(tab == "答案") {
+            setSearchResults(messageList.filter(item =>
+               item.role.toLowerCase().includes("system") 
+            ));
+        }
+    };
 
 
     const handleChange = event => {
@@ -42,23 +61,30 @@ function HistoryComponent() {
 
             <div className="inline-flex rounded-lg border border-gray-100 bg-gray-100 p-1">
                 <button
-                    className="inline-block rounded-md px-4 py-2 text-sm text-blue-500 bg-white hover:text-gray-700 focus:relative"
+                    className={`inline-block rounded-md px-4 py-2 text-sm ${activeTab === '全部' ? 'text-blue-500 bg-white' : 'text-gray-500'
+                        } hover:text-gray-700 focus:relative`}
+                    onClick={() => handleButtonClick('全部')}
                 >
                     全部
                 </button>
 
                 <button
-                    className="inline-block rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative"
+                    className={`inline-block rounded-md px-4 py-2 text-sm ${activeTab === '问题' ? 'text-blue-500 bg-white' : 'text-gray-500'
+                        } hover:text-gray-700 focus:relative`}
+                    onClick={() => handleButtonClick('问题')}
                 >
                     问题
                 </button>
 
                 <button
-                    className="inline-block rounded-md  px-4 py-2 text-sm  text-gray-500 shadow-sm focus:relative"
+                    className={`inline-block rounded-md px-4 py-2 text-sm ${activeTab === '答案' ? 'text-blue-500 bg-white' : 'text-gray-500'
+                        } shadow-sm focus:relative`}
+                    onClick={() => handleButtonClick('答案')}
                 >
                     答案
                 </button>
             </div>
+
 
 
             <ul className='w-4/5  mt-5 '>
