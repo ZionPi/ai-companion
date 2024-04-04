@@ -64,7 +64,7 @@ function InputBox() {
                 ></textarea>
             </div>
             <div className='flex justify-end  mb-5' >
-                <button className="mt-1 w-20  h-10 hover:bg-red-300" onClick={ask}>发送</button>
+                <button className="mt-1 w-20  h-10 hover:bg-[#00d0a7]" onClick={ask}>发送</button>
             </div>
         </>
     );

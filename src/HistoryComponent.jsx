@@ -48,9 +48,9 @@ function HistoryComponent() {
 
             <div className='relative flex items-center m-4'>
                 <input
-                    className='pl-3 w-full md:w-[750px] h-12 '
+                    className='text-sm md:text-lg lg:text-xl w-[400px] md:w-[600px] lg:w-[900px] pl-3  h-12 '
                     type="text"
-                    placeholder="Search..."
+                    placeholder="查找关键词..."
                     value={searchTerm}
                     onChange={handleChange}
                 />

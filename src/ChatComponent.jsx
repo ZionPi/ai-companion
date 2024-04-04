@@ -9,7 +9,7 @@ function ChatComponent() {
 
      const messageList = useSelector(state => state.messages.messageList);
 
-    return (<div className="flex flex-col mt-2 relative w-full">
+    return (<div className="flex flex-col mt-2 w-[500px] md:w-[800px] lg:w-[1340px] lg-relative ">
         <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex items-center mb-4">
                 <div className="ml-3">

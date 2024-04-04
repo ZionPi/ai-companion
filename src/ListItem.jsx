@@ -49,7 +49,7 @@ function ListItem({ item }) {
 
                      <Markdown
                             remarkPlugins={[remarkGfm]}
-                            className="text-sm text-gray-800 mt-1 w-full resize-none md:text-1xl h-auto min-h-2 outline-none border-blue-200 align-top shadow-sm overflow-auto  "
+                            className="text-sm md:text-lg lg:text-xl text-gray-800 mt-1 w-full resize-none md:text-1xl h-auto min-h-2 outline-none border-blue-200 align-top shadow-sm overflow-auto  "
                             children={item.desc}
                             components={{
                                 code(props) {

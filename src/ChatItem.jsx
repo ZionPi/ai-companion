@@ -6,8 +6,29 @@ import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import remarkGfm from 'remark-gfm'
 import LoadingComponent from './Loading';
+import ContextMenu from './components/menu/ContextMenu'
 
 const ChatItem = ({ item }) => {
+
+    const [showMenu, setShowMenu] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    const handleContextMenu = (event) => {
+        event.preventDefault();
+        setPosition({ x: event.pageX, y: event.pageY });
+        setShowMenu(true);
+    };
+
+    const handleClick = () => {
+        setShowMenu(false);
+    };
+
+    const handleDelete = (item) => {
+        console.log('Item deleted:',item);
+        // Add your delete logic here
+        setShowMenu(false);
+    };
+
 
     const [copyText, setCopyText] = useState('复制');
 
@@ -24,7 +45,20 @@ const ChatItem = ({ item }) => {
             item.imgUrl = configData.model_img_url;
         }
         return (
-            <div className="space-y-4 m-4">
+            <div className="space-y-4 m-4"
+                onContextMenu={handleContextMenu}
+                onClick={handleClick}
+            >
+                  {showMenu && (
+                    <div
+                        style={{ top: position.y, left: position.x }}
+                        className="fixed inset-0 z-50"
+                        onClick={handleClick}
+                    >
+                        <ContextMenu onDelete={handleDelete(item)} />
+                    </div>
+                )}
+
                 <div className="flex items-start">
                     <img src={item.imgUrl} alt="Other User Avatar" className="w-8 h-8 rounded-full ml-3" />
 
@@ -33,7 +67,7 @@ const ChatItem = ({ item }) => {
                         <LoadingComponent isLoading={item.isLoading} />
                         <Markdown
                             remarkPlugins={[remarkGfm]}
-                            className="text-sm text-gray-800 mt-1 w-full resize-none md:text-1xl h-auto min-h-2 outline-none border-blue-200 align-top shadow-sm overflow-auto  "
+                            className="text-sm md:text-lg lg:text-xl text-gray-800 mt-1 w-full resize-none md:text-1xl h-auto min-h-2 outline-none border-blue-200 align-top  overflow-auto  "
                             children={item.desc}
                             components={{
                                 code(props) {
@@ -79,13 +113,13 @@ const ChatItem = ({ item }) => {
                 <div className="flex items-end justify-end group">
                     <button
                         onClick={handleCopy}
-                        className={`mr-4 p-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-300 ${copyText === '已复制' ? 'text-green-500' : 'text-blue-500'
+                        className={`mr-4 p-2 text-sm md:text-lg lg:text-xl opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-300 ${copyText === '已复制' ? 'text-green-500' : 'text-blue-500'
                             }`}
                     >
                         {copyText}
                     </button>
                     <div className="bg-red-200 p-3 rounded-lg">
-                        <p className="text-sm text-black">{item.desc}</p>
+                        <p className="text-sm md:text-lg lg:text-xl text-black">{item.desc}</p>
                     </div>
                     <img src={item.imgUrl} alt="Other User Avatar" className="w-8 h-8 rounded-full ml-3" />
                 </div>

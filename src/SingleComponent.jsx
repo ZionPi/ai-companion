@@ -20,7 +20,7 @@ function SingleComponent() {
             <LoadingComponent isLoading={isLoading} />
             <Markdown
                 remarkPlugins={[remarkGfm]}
-                className="bg-orange-100 mt-1 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
+                className="bg-[#1f2e39] text-white mt-1 w-full resize-none md:text-1xl h-auto min-h-250 pl-2 pt-2 rounded-lg outline-none border-blue-200 align-top shadow-sm overflow-auto  "
                 children={answer}
                 components={{
                     code(props) {

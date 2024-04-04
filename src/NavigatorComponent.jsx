@@ -32,7 +32,7 @@ function NavigatorComponent({ onLinkClick }) {
     }
 
 
-    return (<div className="flex h-screen w-16 flex-col justify-between border-e bg-white">
+    return (<div className="max-sm:hidden flex h-screen w-16  flex-col justify-between border-e bg-white">
         <div>
             <div className="inline-flex size-16 items-center justify-center">
                 <span className="grid size-10 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
