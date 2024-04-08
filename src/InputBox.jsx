@@ -53,9 +53,9 @@ function InputBox() {
                 <AlertComponent message={alertMsg} isVisible={showAlert} />
             </div>
            
-            <div className='mt-0'>
+            <div className='mt-4'>
                 <textarea
-                    className='mt-1 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
+                    className='border-2 border-[#00d0a7] mt-1 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
                     id='question_box'
                     placeholder="输入聊天内容"
                     value={message}
