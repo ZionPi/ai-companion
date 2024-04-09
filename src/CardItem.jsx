@@ -3,7 +3,7 @@ import Markdown from 'markdown-to-jsx'
 import { motion } from 'framer-motion';
 // import {processWithRandomSpeaker,processWithRandomSpeakerForLargeText} from './read_helper'
 import colorsData from './data/colors.json';
-
+import Bionic from './Bionic'
 function CardItem({ item }) {
     let processWithRandomSpeakerForLargeText;
 
@@ -88,8 +88,8 @@ function CardItem({ item }) {
                         className={`bg-[${colorsData.bg_color}] text-[${colorsData.fg_color}] outline-none resize-none overflow-auto mx-2 my-3 text-2xl`}
                         value={item.desc}
                         readOnly
-                    >
-                    </textarea>
+                    />
+                    // <Bionic color="text-white" fontSize="text-xl">{item.desc}</Bionic>
 
                 )}
                 {(imageUrl) && (<Markdown options={{ overrides: markdownStyle }} className="mx-2 my-3 text-2xl">{item.desc}</Markdown>)}
