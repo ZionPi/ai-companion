@@ -13,7 +13,7 @@ function HistoryComponent() {
     const [activeTab, setActiveTab] = useState('全部');
 
     const handleButtonClick = (tab) => {
-        console.log(`选中了: ${tab}`);
+        // console.log(`选中了: ${tab}`);
         setActiveTab(tab);
         if(tab == '全部') {
             setSearchResults(messageList);

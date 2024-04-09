@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import colorsData from './data/colors.json';
-import {useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { saveConfig } from './redux/slice/configSlice'; // Update the path to the actual location of your configSlice
 import configDataDefault from './data/config.json';
+import { display, generate } from "facesjs";
 
 function SettingComponent() {
 
@@ -20,6 +21,19 @@ function SettingComponent() {
 
     const [mode, setMode] = useState(configData.mode);
 
+ 
+
+    useEffect(() => {
+        const face = generate();
+        display("avatar-div", face);
+    }, []);
+
+
+    const change_avatar = () => {
+        const face = generate(null, { gender: "female", race: "asian" });
+        display("avatar-div", face);
+    }
+
     const save_config = () => {
         // Create a new object with updated values
         const updatedConfigData = {
@@ -31,7 +45,7 @@ function SettingComponent() {
             mode: mode,
         };
 
-         dispatch(saveConfig(updatedConfigData));
+        dispatch(saveConfig(updatedConfigData));
     };
 
     const reset_config = () => {
@@ -44,11 +58,17 @@ function SettingComponent() {
 
     return (
         <div className="w-full">
+
+
             <div className="flex items-center justify-center p-12">
+
 
                 <div className="mx-auto w-full max-w-[550px]">
                     <div >
                         <div className="-mx-3 flex flex-wrap">
+
+                            <div id="avatar-div" onClick={change_avatar} className=" h-[180px] mb-4 ml-5  bg-gray-300 w-full  sm:w-[110px]"> </div>
+
                             <div className="w-full px-3 sm:w-4/4">
                                 <div className="mb-2">
                                     <label
