@@ -30,7 +30,7 @@ function SettingComponent() {
 
 
     const change_avatar = () => {
-        const face = generate(null, { gender: "female", race: "asian" });
+        const face = generate();//generate(null, { gender: "female", race: "asian" });
         display("avatar-div", face);
     }
 
