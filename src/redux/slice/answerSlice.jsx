@@ -1,8 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import configData from '../../data/config.json';
 import { setContent } from './contentSlice';
 import { v4 as uuidv4 } from 'uuid';
 import {updateMessageList,updateSingleItem } from './messageListSlice';
+
+import configData from '../../data/config.json';
+
+const config = JSON.parse(localStorage.getItem(configData.config_key)) || configData;
+
 
 const generateUniqueId = () => uuidv4();
 
@@ -21,7 +25,7 @@ function getMsg(_id, role, name, msg, img,isloading) {
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: configData.service_url }),
+  baseQuery: fetchBaseQuery({ baseUrl:config.service_url }),
   endpoints: (builder) => ({
     fetchAnswer: builder.query({
       queryFn: async (message, { dispatch }) => {
@@ -30,9 +34,9 @@ export const api = createApi({
 
             const user_msg_id = generateUniqueId();
 
-            const t = getMsg(user_msg_id, "user", configData.user_name, message, configData.user_img_url,false);
+            const t = getMsg(user_msg_id, "user",config.user_name, message,config.user_img_url,false);
 
-            var messageList = JSON.parse(localStorage.getItem(configData.message_list_key)) || [],
+            var messageList = JSON.parse(localStorage.getItem(config.message_list_key)) || [],
 
             messageList = [...messageList, t]
 
@@ -42,9 +46,9 @@ export const api = createApi({
 
             const system_msg_id = generateUniqueId();
 
-            const sysMsg = getMsg(system_msg_id, "system", configData.model_name, "", configData.model_img_url,true);
+            const sysMsg = getMsg(system_msg_id, "system",config.model_name, "",config.model_img_url,true);
 
-            messageList = JSON.parse(localStorage.getItem(configData.message_list_key)) || [],
+            messageList = JSON.parse(localStorage.getItem(config.message_list_key)) || [],
 
             messageList = [...messageList, sysMsg];
 
@@ -56,7 +60,7 @@ export const api = createApi({
 
             // dispatch(updateSingleItem({id:system_msg_id,desc: content,isLoading:true}));
 
-            const response = await fetch(configData.service_url, {
+            const response = await fetch(config.service_url, {
               method: 'POST',
               body: JSON.stringify({
                 model: 'gpt-4',
@@ -85,9 +89,9 @@ export const api = createApi({
                 }
                 try {
                   const json = JSON.parse(c);
-                  if (configData.service_url.includes("8080")) {
+                  if (config.service_url.includes("8080")) {
                     content += json.choices[0].delta.content;
-                  } else if (configData.service_url.includes("7077")) {
+                  } else if (config.service_url.includes("7077")) {
                     content = json.choices[0].message.content;
                   }
 

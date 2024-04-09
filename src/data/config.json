@@ -1,6 +1,9 @@
 {
     "service_url": "http://127.0.0.1:7077/v1/chat/completions",
     "secret_key": " ",
+    "mode":"single",
+    "warning_number":90,
+    "config_key": "service_config",
     "message_list_key": "message_list",
     "user_name": "zionpi",
     "user_img_url": "https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_960_720.png",

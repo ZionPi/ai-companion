@@ -1,5 +1,4 @@
 import ChatItem from './ChatItem';
-import configData from './data/config.json'
 import InputBox from './InputBox';
 // import { MessageListContext } from './MessageListContext';
 import React, { useContext } from 'react';
@@ -8,6 +7,8 @@ import { useSelector } from 'react-redux';
 function ChatComponent() {
 
      const messageList = useSelector(state => state.messages.messageList);
+
+     const configData = useSelector(state => state.config.config);
 
     return (<div className="flex flex-col mt-2 w-[360px] md:w-[800px] lg:w-[1340px] lg-relative ">
         <div className="bg-white rounded-lg shadow-md p-4">

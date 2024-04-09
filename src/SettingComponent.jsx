@@ -1,21 +1,22 @@
-import { useState } from "react";
-import configData from './data/config.json';
+import { useState, useEffect } from "react";
+import colorsData from './data/colors.json';
+import { useSelector } from 'react-redux';
+
 function SettingComponent() {
 
-
+    const configData = useSelector(state => state.config.config);
 
     const [serverAddress, setServerAddress] = useState(configData.service_url);
 
     const [secretKey, setSecretKey] = useState(configData.secret_key);
 
     const save_config = () => {
-        console.log('serverAddress', serverAddress);
-
-        console.log('secretKey', secretKey);
+        localStorage.setItem(configData.config_key, JSON.stringify(configData));
     };
 
     const reset_config = () => {
-
+        var service_config = JSON.parse(localStorage.getItem(configData.config_key)) || "";
+        console.log("service_config", service_config);
     };
 
     return (
@@ -55,7 +56,7 @@ function SettingComponent() {
                                         type="text"
                                         name="lName"
                                         id="lName"
-                                        placeholder="xxxx"
+                                        placeholder="输入密钥"
                                         onChange={(e) => setSecretKey(e.target.value)}
                                         className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
@@ -74,7 +75,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="radio1"
                                         id="radioButton1"
-                                        className="h-5 w-5"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="radioButton1"
@@ -88,7 +89,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="radio1"
                                         id="radioButton2"
-                                        className="h-5 w-5"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="radioButton2"
@@ -157,14 +158,14 @@ function SettingComponent() {
                         <div className="flex justify-end ">
 
                             <button
-                                className="mr-5 hover:shadow-form rounded-md bg-[#c6bfa1] py-3 px-8 text-center text-base font-semibold text-white outline-none"
+                                className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
                                 onClick={reset_config}
                             >
                                 重置
                             </button>
 
                             <button
-                                className="hover:shadow-form rounded-md bg-[#c6bfa1] py-3 px-8 text-center text-base font-semibold text-white outline-none"
+                                className={`hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
                                 onClick={save_config}
                             >
                                 保存

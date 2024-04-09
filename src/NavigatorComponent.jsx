@@ -1,8 +1,11 @@
 import { useState } from "react";
 import "./index.css";
-import configData from './data/config.json';
+import { useSelector } from 'react-redux';
 
 function NavigatorComponent({ onLinkClick }) {
+    
+    const configData = useSelector(state => state.config.config);
+
     const [activePage, setActivePage] = useState("conversation");
 
     const handleHighlight = (page) => {

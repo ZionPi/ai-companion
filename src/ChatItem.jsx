@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import configData from './data/config.json'
 import Markdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -7,8 +6,11 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import remarkGfm from 'remark-gfm'
 import LoadingComponent from './Loading';
 import ContextMenu from './components/menu/ContextMenu'
+import { useSelector } from 'react-redux';
 
 const ChatItem = ({ item }) => {
+    
+    const configData = useSelector(state => state.config.config);
 
     const [showMenu, setShowMenu] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
