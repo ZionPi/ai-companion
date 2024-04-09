@@ -16,6 +16,7 @@ const configSlice = createSlice({
 
         saveConfig: (state, action) => {
             var data = action.payload;
+            state.config = data;
             localStorage.setItem(configData.config_key, JSON.stringify(data));
         }
     },

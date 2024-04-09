@@ -5,10 +5,13 @@ import SingleComponent from './SingleComponent';
 import ErrorComponent from './ErrorComponent';
 import OnlineStatusIndicator from './OnlineStatusIndicator';
 import colorsData from './data/colors.json';
+import {useSelector } from 'react-redux';
 
 function ConversationComponent() {
 
-    const [viewMode, setViewMode] = useState('single');
+    const configData = useSelector(state => state.config.config);
+
+    const [viewMode, setViewMode] = useState(configData.mode);
     const [modeTitle, setModeTitle] = useState('搜寻');
 
     const quote = "Free software is not free beer. It is a matter of liberty ,not price."

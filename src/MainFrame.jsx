@@ -27,7 +27,7 @@ function MainFrame() {
             case "account":
                 return <AccountComponent />;
             case "logout":
-                return <LandingPage />;
+                return <LogoutComponent />;
             default:
                 break;
         }

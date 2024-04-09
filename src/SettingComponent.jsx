@@ -1,22 +1,45 @@
 import { useState, useEffect } from "react";
 import colorsData from './data/colors.json';
-import { useSelector } from 'react-redux';
+import {useDispatch, useSelector } from 'react-redux';
+import { saveConfig } from './redux/slice/configSlice'; // Update the path to the actual location of your configSlice
+import configDataDefault from './data/config.json';
 
 function SettingComponent() {
+
+    const dispatch = useDispatch();
 
     const configData = useSelector(state => state.config.config);
 
     const [serverAddress, setServerAddress] = useState(configData.service_url);
 
+    const [userName, setUsername] = useState(configData.user_name);
+
     const [secretKey, setSecretKey] = useState(configData.secret_key);
 
+    const [warningNumber, setWarningNumber] = useState(configData.warning_number);
+
+    const [mode, setMode] = useState(configData.mode);
+
     const save_config = () => {
-        localStorage.setItem(configData.config_key, JSON.stringify(configData));
+        // Create a new object with updated values
+        const updatedConfigData = {
+            ...configData,
+            service_url: serverAddress,
+            user_name: userName,
+            secret_key: secretKey,
+            warning_number: warningNumber,
+            mode: mode,
+        };
+
+         dispatch(saveConfig(updatedConfigData));
     };
 
     const reset_config = () => {
-        var service_config = JSON.parse(localStorage.getItem(configData.config_key)) || "";
-        console.log("service_config", service_config);
+        setServerAddress(configDataDefault.service_url);
+        setUsername(configDataDefault.user_name);
+        setSecretKey(configDataDefault.secret_key);
+        setWarningNumber(configDataDefault.warning_number);
+        setMode(configDataDefault.mode);
     };
 
     return (
@@ -26,6 +49,48 @@ function SettingComponent() {
                 <div className="mx-auto w-full max-w-[550px]">
                     <div >
                         <div className="-mx-3 flex flex-wrap">
+                            <div className="w-full px-3 sm:w-4/4">
+                                <div className="mb-2">
+                                    <label
+                                        htmlFor="fName"
+                                        className="mb-3 block text-base font-medium text-[#07074D]"
+                                    >
+                                        用户名
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="fName"
+                                        id="fName"
+                                        value={userName}
+                                        placeholder="用户名"
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="text-[#07074D] border-none w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                    />
+                                </div>
+                            </div>
+
+
+                            <div className="w-full px-3 sm:w-4/4">
+                                <div className="mb-5">
+                                    <label
+                                        htmlFor="fName"
+                                        className="mb-3 block text-base font-medium text-[#07074D]"
+                                    >
+                                        邮箱
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="fName"
+                                        id="fName"
+                                        placeholder="邮箱"
+                                        onChange={(e) => setServerAddress(e.target.value)}
+                                        className="border-none w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                    />
+                                </div>
+                            </div>
+
+
+
                             <div className="w-full px-3 sm:w-3/4">
                                 <div className="mb-5">
                                     <label
@@ -38,9 +103,10 @@ function SettingComponent() {
                                         type="text"
                                         name="fName"
                                         id="fName"
-                                        placeholder="127.0.0.1"
+                                        value={serverAddress}
+                                        placeholder="输入服务器信息"
                                         onChange={(e) => setServerAddress(e.target.value)}
-                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                        className="border-none w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
                             </div>
@@ -56,9 +122,10 @@ function SettingComponent() {
                                         type="text"
                                         name="lName"
                                         id="lName"
+                                        value={secretKey}
                                         placeholder="输入密钥"
                                         onChange={(e) => setSecretKey(e.target.value)}
-                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                        className="border-none w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
                             </div>
@@ -75,6 +142,8 @@ function SettingComponent() {
                                         type="radio"
                                         name="radio1"
                                         id="radioButton1"
+                                        checked={mode === "single"}
+                                        onChange={() => setMode("single")}
                                         className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
@@ -89,6 +158,8 @@ function SettingComponent() {
                                         type="radio"
                                         name="radio1"
                                         id="radioButton2"
+                                        checked={mode === "chat"}
+                                        onChange={() => setMode("chat")}
                                         className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
@@ -100,6 +171,7 @@ function SettingComponent() {
                                 </div>
                             </div>
                         </div>
+
 
                         <div className="mb-5">
                             <label
@@ -113,10 +185,84 @@ function SettingComponent() {
                                 name="guest"
                                 id="guest"
                                 placeholder="90"
+                                value={warningNumber}
+                                onChange={(e) => setWarningNumber(e.target.value)}
                                 min="0"
-                                className="w-full appearance-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                className="border-none w-full appearance-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                             />
                         </div>
+
+
+
+                        <div className="mb-5">
+                            <label className="mb-3 block text-base font-medium text-[#07074D]">
+                                订阅模式
+                            </label>
+                            <div className="flex items-center space-x-6">
+                                <div className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="subscription_radio"
+                                        id="fee_radio1"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                    />
+                                    <label
+                                        htmlFor="fee_radio1"
+                                        className="pl-3 text-base font-medium text-[#07074D]"
+                                    >
+                                        免费
+                                    </label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="subscription_radio"
+                                        id="fee_radio2"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                    />
+                                    <label
+                                        htmlFor="fee_radio2"
+                                        className="pl-3 text-base font-medium text-[#07074D]"
+                                    >
+                                        月付
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="subscription_radio"
+                                        id="fee_radio3"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                    />
+                                    <label
+                                        htmlFor="fee_radio3"
+                                        className="pl-3 text-base font-medium text-[#07074D]"
+                                    >
+                                        年付
+                                    </label>
+                                </div>
+
+
+                                <div className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="subscription_radio"
+                                        id="fee_radio4"
+                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                    />
+                                    <label
+                                        htmlFor="fee_radio4"
+                                        className="pl-3 text-base font-medium text-[#07074D]"
+                                    >
+                                        终身
+                                    </label>
+                                </div>
+
+
+                            </div>
+                        </div>
+
 
                         <div className="-mx-3 flex flex-wrap hidden">
                             <div className="w-full px-3 sm:w-1/2">
@@ -131,7 +277,7 @@ function SettingComponent() {
                                         type="date"
                                         name="date"
                                         id="date"
-                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
                             </div>
@@ -147,7 +293,7 @@ function SettingComponent() {
                                         type="time"
                                         name="time"
                                         id="time"
-                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                                     />
                                 </div>
                             </div>
