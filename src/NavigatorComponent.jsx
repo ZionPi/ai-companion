@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./index.css";
 import { useSelector } from 'react-redux';
+import { display, generate } from "facesjs";
+import { useEffect } from "react";
 
 function NavigatorComponent({ onLinkClick }) {
     
@@ -12,6 +14,15 @@ function NavigatorComponent({ onLinkClick }) {
         setActivePage(page);
     }
 
+    useEffect(() => {
+        const face = generate();
+        display("avatar", face);
+    }, []);
+
+   const change_avatar = () => {
+        const face = generate();//generate(null, { gender: "female", race: "asian" });
+        display("avatar", face);
+    }
 
     function getLinkClass(linkName) {
 
@@ -38,10 +49,13 @@ function NavigatorComponent({ onLinkClick }) {
     return (<div className="max-sm:hidden flex h-screen w-16  flex-col justify-between border-e bg-white">
         <div>
             <div className="inline-flex size-16 items-center justify-center">
-                <span className="grid size-10 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
-                    {configData.user_name}
-                </span>
+                <div id="avatar" onClick={change_avatar} className="size-14 ml-4"></div>
             </div>
+  
+            <span className="grid ml-5 size-6 place-content-center  text-gray-600">
+                {configData.user_name}
+            </span>
+
 
             <div className="border-t border-gray-100">
                 <div className="px-2">
