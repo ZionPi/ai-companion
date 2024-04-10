@@ -3,7 +3,7 @@ import Markdown from 'markdown-to-jsx'
 import { motion } from 'framer-motion';
 // import {processWithRandomSpeaker,processWithRandomSpeakerForLargeText} from './read_helper'
 import colorsData from './data/colors.json';
-import Bionic from './Bionic'
+// import Bionic from './Bionic'
 function CardItem({ item }) {
     let processWithRandomSpeakerForLargeText;
 
