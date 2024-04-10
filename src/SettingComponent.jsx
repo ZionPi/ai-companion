@@ -153,9 +153,9 @@ function SettingComponent() {
 
 
                         <div className="mb-5">
-                            <label className="mb-3 block text-base font-medium text-[#07074D]">
+                            <p className="mb-3 block text-base font-medium text-[#07074D]">
                                 默认交互模式
-                            </label>
+                            </p>
                             <div className="flex items-center space-x-6">
                                 <div className="flex items-center">
                                     <input
@@ -215,9 +215,9 @@ function SettingComponent() {
 
 
                         <div className="mb-5">
-                            <label className="mb-3 block text-base font-medium text-[#07074D]">
+                            <p  className="mb-3 block text-base font-medium text-[#07074D]">
                                 订阅模式
-                            </label>
+                            </p>
                             <div className="flex items-center space-x-6">
                                 <div className="flex items-center">
                                     <input
