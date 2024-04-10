@@ -72,15 +72,15 @@ function SettingComponent() {
                             <div className="w-full px-3 sm:w-4/4">
                                 <div className="mb-2">
                                     <label
-                                        htmlFor="fName"
+                                        htmlFor="username_input"
                                         className="mb-3 block text-base font-medium text-[#07074D]"
                                     >
                                         用户名
                                     </label>
                                     <input
                                         type="text"
-                                        name="fName"
-                                        id="fName"
+                                        name="username_input"
+                                        id="username_input"
                                         value={userName}
                                         placeholder="用户名"
                                         onChange={(e) => setUsername(e.target.value)}
@@ -93,15 +93,15 @@ function SettingComponent() {
                             <div className="w-full px-3 sm:w-4/4">
                                 <div className="mb-5">
                                     <label
-                                        htmlFor="fName"
+                                        htmlFor="email_input"
                                         className="mb-3 block text-base font-medium text-[#07074D]"
                                     >
                                         邮箱
                                     </label>
                                     <input
                                         type="text"
-                                        name="fName"
-                                        id="fName"
+                                        name="email_input"
+                                        id="email_input"
                                         placeholder="邮箱"
                                         onChange={(e) => setServerAddress(e.target.value)}
                                         className="border-none w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
@@ -114,15 +114,15 @@ function SettingComponent() {
                             <div className="w-full px-3 sm:w-3/4">
                                 <div className="mb-5">
                                     <label
-                                        htmlFor="fName"
+                                        htmlFor="server_address_input"
                                         className="mb-3 block text-base font-medium text-[#07074D]"
                                     >
                                         服务器地址
                                     </label>
                                     <input
                                         type="text"
-                                        name="fName"
-                                        id="fName"
+                                        name="server_address_input"
+                                        id="server_address_input"
                                         value={serverAddress}
                                         placeholder="输入服务器信息"
                                         onChange={(e) => setServerAddress(e.target.value)}
@@ -176,7 +176,7 @@ function SettingComponent() {
                                 <div className="flex items-center">
                                     <input
                                         type="radio"
-                                        name="radio1"
+                                        name="radio2"
                                         id="radioButton2"
                                         checked={mode === "chat"}
                                         onChange={() => setMode("chat")}
