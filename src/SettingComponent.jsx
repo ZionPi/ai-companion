@@ -160,7 +160,7 @@ function SettingComponent() {
                                 <div className="flex items-center">
                                     <input
                                         type="radio"
-                                        name="radio1"
+                                        name="interactionMode"
                                         id="radioButton1"
                                         checked={mode === "single"}
                                         onChange={() => setMode("single")}
@@ -176,7 +176,7 @@ function SettingComponent() {
                                 <div className="flex items-center">
                                     <input
                                         type="radio"
-                                        name="radio2"
+                                        name="interactionMode"
                                         id="radioButton2"
                                         checked={mode === "chat"}
                                         onChange={() => setMode("chat")}
