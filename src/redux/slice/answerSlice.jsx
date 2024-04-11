@@ -23,6 +23,7 @@ function getMsg(_id, role, name, msg, img,isloading) {
   return newMessage;
 }
 
+
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl:config.service_url }),

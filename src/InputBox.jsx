@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import "./index.css";
 import AlertComponent from './AlertComponent';
 import { useFetchAnswerQuery } from './redux/slice/answerSlice';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
 function InputBox() {
@@ -47,6 +48,28 @@ function InputBox() {
         setExecuteQuery(true);
     }
 
+    const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+
+    const askGoogle = async () => {
+        // For text-only input, use the gemini-pro model
+        setQueryMessage(message); 
+
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        const prompt = queryMessage;
+
+        const result = await model.generateContentStream(prompt);
+
+        let text = '';
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            console.log(chunkText);
+            text += chunkText;
+            console.log(text);
+        }
+       
+    }
+
     return (
         <>
             <div className='flex items-center justify-center '>
@@ -64,7 +87,7 @@ function InputBox() {
                 ></textarea>
             </div>
             <div className='flex justify-end  mb-5' >
-                <button className="mt-1 w-20  h-10 hover:bg-[#00d0a7]" onClick={ask}>发送</button>
+                <button className="mt-1 w-20  h-10 hover:bg-[#00d0a7]" onClick={askGoogle}>发送</button>
             </div>
         </>
     );
