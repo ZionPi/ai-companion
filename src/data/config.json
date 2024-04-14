@@ -1,6 +1,36 @@
 {
     "service_url": "http://127.0.0.1:7077/v1/chat/completions",
     "secret_key": " ",
+    "active_provider": "Google",
+    "llms": [
+        {
+            "provider": "Google",
+            "service_url": "",
+            "api_key": "",
+            "active_model":"",
+            "model_list": [
+                "gemini-1.5-pro-latest",
+                "gemini-pro"
+            ]
+        },
+        {
+            "provider": "Coze",
+            "service_url": "http://127.0.0.1:7077/v1/chat/completions",
+            "api_key": "",
+            "active_model":"",  
+            "model_list": []
+        },
+        {
+            "provider": "OpenAI",
+            "service_url": "",
+            "api_key": "",
+            "active_model":"",
+            "model_list": [
+                "gpt3.5",
+                "gpt4"
+            ]
+        }
+    ],
     "mode":"single",
     "warning_number":90,
     "config_key": "service_config",

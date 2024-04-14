@@ -42,7 +42,7 @@ function ConversationComponent() {
 
     useEffect(() => {
         function handleKeyDown(e) {
-            if (e.metaKey && e.key === 'x') {
+            if (e.metaKey && e.altKey && e.key === 'x') {
                 toggleMode();
                 scrollToTop();
             }

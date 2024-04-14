@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { saveConfig } from './redux/slice/configSlice'; // Update the path to the actual location of your configSlice
 import configDataDefault from './data/config.json';
 import { display, generate } from "facesjs";
+import LLMConfig from "./LLMConfig";
 
 function SettingComponent() {
 
@@ -55,6 +56,25 @@ function SettingComponent() {
         setWarningNumber(configDataDefault.warning_number);
         setMode(configDataDefault.mode);
     };
+
+const exportLocalStorage = () => {
+  // Retrieve all data from localStorage
+  const localStorageData = { ...localStorage };
+
+  // Convert data to JSON string
+  const dataStr = JSON.stringify(localStorageData);
+
+  // Create a Blob object with the data
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+  // Create an anchor element and trigger the download
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.href = URL.createObjectURL(dataBlob);
+  downloadAnchor.download = 'localStorageData.json'; // Name of the file to be downloaded
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  document.body.removeChild(downloadAnchor);
+};
 
     return (
         <div className="w-full">
@@ -109,7 +129,9 @@ function SettingComponent() {
                                 </div>
                             </div>
 
-
+                            <div className="w-full px-3 sm:w-4/4">
+                                <LLMConfig> </LLMConfig>
+                            </div>
 
                             <div className="w-full px-3 sm:w-3/4">
                                 <div className="mb-5">
@@ -168,7 +190,7 @@ function SettingComponent() {
                                         id="radioButton1"
                                         checked={mode === "single"}
                                         onChange={() => setMode("single")}
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5  appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="radioButton1"
@@ -184,7 +206,7 @@ function SettingComponent() {
                                         id="radioButton2"
                                         checked={mode === "chat"}
                                         onChange={() => setMode("chat")}
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5   appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="radioButton2"
@@ -212,7 +234,7 @@ function SettingComponent() {
                                 value={warningNumber}
                                 onChange={(e) => setWarningNumber(e.target.value)}
                                 min="0"
-                                className="border-none w-full appearance-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
+                                className="border-none w-full  rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#07074D]  outline-none focus:border-[#6A64F1] focus:shadow-md"
                             />
                         </div>
 
@@ -228,7 +250,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="subscription_radio"
                                         id="fee_radio1"
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5  appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="fee_radio1"
@@ -242,7 +264,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="subscription_radio"
                                         id="fee_radio2"
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5  appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="fee_radio2"
@@ -257,7 +279,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="subscription_radio"
                                         id="fee_radio3"
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5  appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="fee_radio3"
@@ -273,7 +295,7 @@ function SettingComponent() {
                                         type="radio"
                                         name="subscription_radio"
                                         id="fee_radio4"
-                                        className={`h-5 w-5  appearance-none rounded-full border border-gray-300 checked:bg-[${colorsData.fg_color}] `}
+                                        className={`h-5 w-5  appearance-none rounded-full  border border-gray-400 checked:bg-green-500  checked:bg-[${colorsData.fg_color}] `}
                                     />
                                     <label
                                         htmlFor="fee_radio4"
@@ -327,6 +349,13 @@ function SettingComponent() {
 
                         <div className="flex justify-end ">
 
+  <button
+    className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
+    onClick={exportLocalStorage}
+  >
+    导出历史
+  </button>
+
                             <button
                                 className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
                                 onClick={reset_config}
@@ -341,6 +370,9 @@ function SettingComponent() {
                                 保存
                             </button>
                         </div>
+
+
+
                     </div>
                 </div>
             </div>

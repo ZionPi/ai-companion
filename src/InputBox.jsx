@@ -1,93 +1,100 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import "./index.css";
 import AlertComponent from './AlertComponent';
-import { useFetchAnswerQuery } from './redux/slice/answerSlice';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { useFetchGoogleAnswerQuery, useFetchAnswerQuery } from './redux/slice/answerSlice';
 
 function InputBox() {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [message, setMessage] = useState('');
 
-    // const messageList = useSelector(state => state.messages.messageList);
-    
     const [executeQuery, setExecuteQuery] = useState(false);
+    const [executeQueryGoogle, setExecuteQueryGoogle] = useState(false);
+    const [queryMessage, setQueryMessage] = useState('');
 
-    const [queryMessage, setQueryMessage] = useState(''); // new state variable
+    const { refetch: refetchAnswer } = useFetchAnswerQuery(queryMessage, { skip: !executeQuery });
+    const { refetch: refetchGoogleAnswer } = useFetchGoogleAnswerQuery(queryMessage, { skip: !executeQueryGoogle });
 
-    const { refetch } = useFetchAnswerQuery(queryMessage, { skip: !executeQuery });
+    const contentEditableRef = useRef(null);
 
+    const [imageFile, setImageFile] = useState(null); // State to store the image file
 
     useEffect(() => {
         if (executeQuery) {
-            refetch().finally(() => {setExecuteQuery(false);}); // set loading to false when refetch ends
+            refetchAnswer().finally(() => setExecuteQuery(false));
         }
-    }, [executeQuery, refetch]);
-
-
-
+        if (executeQueryGoogle) {
+            refetchGoogleAnswer().finally(() => setExecuteQueryGoogle(false));
+        }
+    }, [executeQuery, executeQueryGoogle, refetchAnswer, refetchGoogleAnswer]);
 
     const handleKeyDown = async (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            if (message === "") {
+            if (!message.trim()) {
                 setShowAlert(true);
-                console.log('setShowAlert', "setShowAlert has been called.");
                 setAlertMsg("输入框为空");
                 return;
             }
-
             ask();
         }
-    }
+    };
 
     const ask = () => {
-        setQueryMessage(message); // set the queryMessage state when '发送' button is clicked
-        setExecuteQuery(true);
-    }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setQueryMessage(message);
+        setExecuteQueryGoogle(true);
+    };
 
-    const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-
-    const askGoogle = async () => {
-        // For text-only input, use the gemini-pro model
-        setQueryMessage(message); 
-
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-        const prompt = queryMessage;
-
-        const result = await model.generateContentStream(prompt);
-
-        let text = '';
-        for await (const chunk of result.stream) {
-            const chunkText = chunk.text();
-            console.log(chunkText);
-            text += chunkText;
-            console.log(text);
+    const handleDrop = (e) => {
+        e.preventDefault();
+        const items = e.dataTransfer.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].kind === 'file') {
+                const file = items[i].getAsFile();
+                setImageFile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.style.maxWidth = '20px';
+                    img.style.height = '20px';
+                    document.getElementById('editable').appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
         }
-       
-    }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    const handleInput = (e) => {
+        const html = contentEditableRef.current.innerHTML;
+        setMessage(html);
+    };
 
     return (
         <>
-            <div className='flex items-center justify-center '>
+            <div className='flex items-center justify-center'>
                 <AlertComponent message={alertMsg} isVisible={showAlert} />
             </div>
-           
             <div className='mt-4'>
-                <textarea
+                <div
                     className='border-2 border-[#00d0a7] mt-1 w-full h-auto min-h-250 rounded-lg outline-none pl-2 pt-2 text-2xl resize-none overflow-auto'
-                    id='question_box'
+                    id='editable'
+                    contentEditable
                     placeholder="输入聊天内容"
-                    value={message}
+                    onInput={handleInput}
                     onKeyDown={handleKeyDown}
-                    onChange={(e) => setMessage(e.target.value)}
-                ></textarea>
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    ref={contentEditableRef}
+                ></div>
             </div>
-            <div className='flex justify-end  mb-5' >
-                <button className="mt-1 w-20  h-10 hover:bg-[#00d0a7]" onClick={askGoogle}>发送</button>
+            <div className='flex justify-end mb-5'>
+                <button className="mt-1 w-20 h-10 hover:bg-[#00d0a7]" onClick={ask}>发送</button>
             </div>
         </>
     );
