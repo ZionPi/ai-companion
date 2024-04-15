@@ -1,38 +1,123 @@
 import ChatItem from './ChatItem';
 import InputBox from './InputBox';
 // import { MessageListContext } from './MessageListContext';
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import colorsData from './data/colors.json';
+import AutoSizer from 'react-virtualized-auto-sizer';
+
 function ChatComponent() {
     const [showScrollButton, setShowScrollButton] = useState(false);
 
     const messageList = useSelector(state => state.messages.messageList);
 
+    const scrollableContainerRef = useRef(null);
+
+    const listRef = useRef();
+    // Create a new instance of CellMeasurerCache
+    const cache = new CellMeasurerCache({
+        fixedWidth: true, // Set to true if your list's width is fixed
+        defaultHeight: 100, // Provide a default height for the cells
+    });
+
+
+
+    // The Row component that will be rendered for each item in the list
+    const Row = ({ index, key, parent, style }) => (
+        <CellMeasurer
+            cache={cache}
+            columnIndex={0}
+            key={key}
+            parent={parent}
+            rowIndex={index}
+        >
+            {({ measure }) => (
+                <div style={style}>
+                    {/* You must call measure after the content has been rendered */}
+                    <div onLoad={measure}>
+                        <ChatItem item={messageList[index]} />
+                    </div>
+                </div>
+            )}
+        </CellMeasurer>
+    );
+
+
+
+    // Pass the height and width to the List component
+    const renderList = useCallback(({ height, width }) => (
+        <List
+            width={width}
+            height={height}
+            ref={listRef}
+            deferredMeasurementCache={cache} // Pass the cache instance to the List
+            rowHeight={cache.rowHeight} // Tell the List how to get each row's height
+            rowRenderer={Row} // Provide the Row component
+            rowCount={messageList.length} // The number of items in the list
+            onScroll={({ scrollTop }) => {
+                // Check if the scroll position is greater than a certain threshold
+                if (scrollTop > 200) {
+                    setShowScrollButton(true);
+                } else {
+                    setShowScrollButton(false);
+                }
+            }}
+            overscanRowCount={2} // How many rows to render above/below the visible area
+        />
+    ), [messageList.length]);
+
     const configData = useSelector(state => state.config.config);
 
     let scrollTimeout;
 
-  // Detect scroll position and show/hide button accordingly
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 200) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
-        };
+    // // Detect scroll position and show/hide button accordingly
+    // useEffect(() => {
+    //     const handleScroll = () => {
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    //         console.log("showScrollButton",showScrollButton);
+    //         // Make sure the ref is attached to the element
+    //         if (scrollableContainerRef.current) {
+    //             // Use scrollTop to get the scroll position of the container
+    //             if (scrollableContainerRef.current.scrollTop > 200) {
+    //                 setShowScrollButton(true);
+    //             } else {
+    //                 setShowScrollButton(false);
+    //             }
+    //         }
+    //     };
 
+    //     // Attach the event listener to the scrollable container
+    //     const scrollableElement = scrollableContainerRef.current;
+    //     if (scrollableElement) {
+    //         scrollableElement.addEventListener('scroll', handleScroll);
+    //     }
+
+    //     // Clean up the event listener when the component is unmounted
+    //     return () => {
+    //         if (scrollableElement) {
+    //             scrollableElement.removeEventListener('scroll', handleScroll);
+    //         }
+    //     };
+    // }, [scrollableContainerRef]); // Empty dependency array ensures this effect runs only once after the initial render
+
+
+
+    const scrollToTop = () => {
+        // Using the 'scrollToRow' method of the List to scroll to the top
+        if (listRef.current) {
+            listRef.current.scrollToRow(0);
+        }
+    };
 
     const scrollToBottom = () => {
-        window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth',
-        });
+        // Assuming 'data' is the array of items you're rendering in the List
+        const lastIndex = messageList.length - 1;
+
+        // Using the 'scrollToRow' method of the List to scroll to the bottom
+        if (listRef.current) {
+            listRef.current.scrollToRow(lastIndex);
+        }
 
         // Clear any existing timeout
         if (scrollTimeout) {
@@ -42,8 +127,9 @@ function ChatComponent() {
         // Hide the scroll button after 2 seconds
         scrollTimeout = setTimeout(() => {
             setShowScrollButton(false);
-        }, 1000);
+        }, 2000);
     };
+
 
     // Cleanup timeout on component unmount
     useEffect(() => {
@@ -57,12 +143,7 @@ function ChatComponent() {
 
 
 
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-        });
-    };
+
 
 
     return (<div className="flex flex-col mt-2 w-[360px] md:w-[800px] lg:w-[1340px] lg-relative ">
@@ -76,18 +157,21 @@ function ChatComponent() {
             </div>
 
 
-            {messageList.map(item => (
-                <ChatItem key={item.id} item={item} />
-            ))}
+            <div className="flex-1 relative" style={{ minHeight: '800px' }} ref={scrollableContainerRef}> {/* Ensure minimum height */}
+                <AutoSizer>
+                    {renderList}
+                </AutoSizer>
+            </div>
+
 
             <InputBox ></InputBox>
 
-         {showScrollButton && (
+            {showScrollButton && (
                 <button
                     onClick={scrollToBottom}
-                    className={`fixed bottom-24 right-6 bg-[${colorsData.bg_color}]  text-white font-bold py-2 px-4 rounded-full`}
+                    className={`absolute top-80 right-16 bg-[${colorsData.bg_color}]  text-white font-bold py-2 px-4 rounded-full`}
                 >
-                    <svg  className='w-4 h-5' fill="none" strokeWidth={3} stroke={`${colorsData.fg_color}`}viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <svg className='w-4 h-5' fill="none" strokeWidth={3} stroke={`${colorsData.fg_color}`} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
                 </button>
@@ -97,13 +181,15 @@ function ChatComponent() {
             {showScrollButton && (
                 <button
                     onClick={scrollToTop}
-                    className={`mb-5 fixed bottom-32 right-6 bg-[${colorsData.bg_color}]  text-white font-bold py-2 px-4 rounded-full`}
+                    className={`absolute top-64 right-16 bg-[${colorsData.bg_color}]  text-white font-bold py-2 px-4 rounded-full`}
                 >
                     <svg className="w-4 h-5" fill="none" strokeWidth={3} stroke={`${colorsData.fg_color}`} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
                     </svg>
                 </button>
             )}
+
+
 
         </div>
     </div>);

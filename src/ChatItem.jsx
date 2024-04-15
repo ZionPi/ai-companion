@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , memo} from 'react';
 import Markdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -133,4 +133,4 @@ const ChatItem = ({ item }) => {
     }
 };
 
-export default ChatItem;
+export default  memo(ChatItem);

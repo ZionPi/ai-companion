@@ -9,6 +9,8 @@ import LogoutComponent from './LogoutComponent'
 import { useState } from "react";
 import Timeline from "./Timeline";
 import LandingPage from "./LandingPage";
+import DancingBall from './DancingBall'
+import Ballon from './Balloon'
 
 function MainFrame() {
 
@@ -17,7 +19,7 @@ function MainFrame() {
     function renderContent() {
         switch (content) {
             case "setting":
-                return <SettingComponent />;
+                return <Ballon />;
             case "conversation":
                 return <ConversationComponent />;
             case "history":
