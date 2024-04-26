@@ -30,9 +30,19 @@ function CardItem({ item }) {
     };
 
     const extractImageUrl = (markdownText) => {
-        const imageRegex = /!\[.*?\]\((.*?)\)/; // Regex to match Markdown image syntax
+        // Ensure markdownText is a string
+        if (typeof markdownText !== 'string') return null;
+
+        if (!markdownText) return null; // Handle empty or null input
+
+        const imageRegex = /!\[.*?\]\((.*?)\)/;
         const matches = markdownText.match(imageRegex);
-        return matches ? matches[1] : null; // Return the URL or null if no image syntax is found
+
+        if (matches) {
+            return matches[1]; // Return the extracted URL
+        } else {
+            return null; // Or a default URL, placeholder, or empty string
+        }
     };
 
 
@@ -73,7 +83,7 @@ function CardItem({ item }) {
             whileHover={{ scale: 1.1 }}
         >
 
-            <div className={`relative bg-[${colorsData.bg_color}] flex flex-col justify-center w-[200px] h-[300px] md:w-[400px] md:h-[600px] rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2.5 
+            <div className={`relative bg-[${colorsData.bg_color}] flex flex-col justify-center w-[100px] h-[150px] md:w-[200px] md:h-[300px] rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2.5 
             border-1 border-[${colorsData.bg_color}]-300 border-opacity-50`} >
 
                 <div className="group absolute top-0 right-0 p-2 bg-transparent rounded-bl-lg" onClick={(event) => playSound(item, event)}>
@@ -85,7 +95,7 @@ function CardItem({ item }) {
                 {!imageUrl && (
 
                     <textarea ref={textAreaRef}
-                        className={`bg-[${colorsData.bg_color}] text-[${colorsData.fg_color}] outline-none resize-none overflow-auto mx-2 my-3 text-2xl`}
+                        className={`bg-[${colorsData.bg_color}] text-[#ffffff] outline-none resize-none overflow-auto mx-2 my-3 text-sm`}
                         value={item.desc}
                         readOnly
                     />

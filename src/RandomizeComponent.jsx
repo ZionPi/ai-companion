@@ -1,9 +1,10 @@
 import CardItem from "./CardItem";
 import "./index.css";
 import { motion, Reorder, useAnimation } from "framer-motion"
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-
+import { Grid, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 function RandomizeComponent() {
 
@@ -21,6 +22,77 @@ function RandomizeComponent() {
         return acc;
     }, {}));
 
+    const gridRef = useRef();
+    // Create a new instance of CellMeasurerCache
+    // const cache = new CellMeasurerCache({
+    //     fixedWidth: true, // Set to true if your list's width is fixed
+    //     defaultHeight: 300, // Provide a default height for the cells
+    // });
+
+    const itemsPerRow = 6;
+
+    // Calculate the number of rows needed
+    const rowCount = Math.ceil(listItems.length / itemsPerRow);
+
+    const cache = new CellMeasurerCache({
+        fixedHeight: false, // or false if height is dynamic
+        defaultWidth: 100,
+        defaultHeight: 50, // Adjust based on your content
+    });
+
+
+    const cellRenderer = ({ columnIndex, rowIndex, key, parent, style }) => {
+
+        const index = rowIndex * itemsPerRow + columnIndex;
+
+        const item = listItems[index];
+
+        if(!item) return null;
+
+        return (<CellMeasurer
+            cache={cache}
+            columnIndex={columnIndex}
+            rowIndex={rowIndex} 
+            key={key}
+            parent={parent}
+        >
+            {({ measure }) => (
+                <div style={style}>
+                    {/* You must call measure after the content has been rendered */}
+                    <div onLoad={measure} >
+                        <Reorder.Item
+                            key={item.id}
+                            tabIndex="0"
+                            value={item}
+                            id={`item-${item.id}`} // Add an ID to each item for scrolling
+                            className="cursor-pointer focus:outline-none mt-16 mx-4">
+                            <motion.div animate={animationControls.current[item.id]} id={`motion-item-${item.id}`}>
+                                   <CardItem item={item} />
+                            </motion.div>
+                        </Reorder.Item>
+
+                    </div>
+                </div>
+            )}
+        </CellMeasurer>)
+    };
+
+
+    // Pass the height and width to the List component
+    const renderList = useCallback(({ height, width }) => (
+        <Grid
+            ref={gridRef}
+            cellRenderer={cellRenderer}
+            columnCount={itemsPerRow}
+            columnWidth={cache.columnWidth}
+            height={height}
+            rowCount={rowCount} // Since it's horizontal, you might only have one row
+            rowHeight={cache.rowHeight} // You can set this to a fixed height
+            width={width}
+            overscanRowCount={2} // How many rows to render above/below the visible area
+        />
+    ), [listItems, listItems.length]);
+
 
     const scrollToElement = (element) => {
         const elementRect = element.getBoundingClientRect();
@@ -31,11 +103,17 @@ function RandomizeComponent() {
 
     // Function to scroll to a random item
     const scrollToRandomItem = () => {
-        const randomIndex = Math.floor(Math.random() * listItems.length);
-        const elementToScrollTo = document.getElementById(`item-${listItems[randomIndex].id}`);
-        // elementToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Use the custom function to scroll
-        scrollToElement(elementToScrollTo);
+         const randomIndex = Math.floor(Math.random() * listItems.length);
+    
+        const rowIndex = Math.floor(randomIndex / itemsPerRow);
+        const columnIndex = randomIndex % itemsPerRow;
+
+        if (gridRef.current) {
+            gridRef.current.scrollToCell({
+                columnIndex: columnIndex,
+                rowIndex: rowIndex,
+            });
+        }
         // Start the animation after the element is in view
         setTimeout(() => {
             animationControls.current[listItems[randomIndex].id].start({
@@ -60,7 +138,7 @@ function RandomizeComponent() {
             } else if (event.metaKey && event.code === 'Digit0') {
                 event.preventDefault(); // Prevent the default Command + 0 action
                 // Scroll to the first item
-                window.scrollTo(0, {behavior: 'smooth'});
+                window.scrollTo(0, { behavior: 'smooth' });
             }
         };
 
@@ -74,39 +152,21 @@ function RandomizeComponent() {
 
 
     return (<div >
-
         <div className="flex justify-center items-center h-screen mx-4">
             <Reorder.Group
                 axis="x" // Change to "x" for horizontal reordering
                 onReorder={setListItems}
                 values={listItems}
                 className="flex gap-10" // Ensure flex row layout
-
             >
-                {listItems.map((el) => (
-                    <Reorder.Item
-                        key={el.id}
-                        tabIndex="0"
-                        value={el}
-                        id={`item-${el.id}`} // Add an ID to each item for scrolling
-                        className="cursor-pointer focus:outline-none">
-                        <motion.div animate={animationControls.current[el.id]} id={`motion-item-${el.id}`}>
-                            <CardItem item={el} />
-                        </motion.div>
-                    </Reorder.Item>
-                ))}
-
+                <div className="flex-1 relative w-[1400px] h-[800px]"  > {/* Ensure minimum height */}
+                    <AutoSizer>
+                        {renderList}
+                    </AutoSizer>
+                </div>
             </Reorder.Group>
         </div>
-        {/* <div className="flow flow-row flex justify-around gap-10 mt-20">
-            <svg className="w-10 h-10" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-            </svg>
 
-            <svg className="w-10 h-10" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>
-        </div> */}
     </div>);
 }
 

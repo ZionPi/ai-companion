@@ -77,7 +77,7 @@ function ConversationComponent() {
 
 
     return (
-        <div className='flex flex-col w-full max-sm:mx-2 mx-5 relative' >
+        <div className='flex flex-col mt-2 w-[360px] md:w-[800px] lg:w-[1340px] lg-relative  max-sm:mx-2 mx-5 relative' >
 
             <div className={`flex items-center justify-between gap-4 bg-[${colorsData.bg_color}] px-4 py-3 text-white`}>
                 {/* <p className="text-sm font-medium">

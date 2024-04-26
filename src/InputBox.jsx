@@ -1,37 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import "./index.css";
 import AlertComponent from './AlertComponent';
-import { useFetchGoogleAnswerQuery, useFetchAnswerQuery } from './redux/slice/answerSlice';
+import { answerApi} from './redux/slice/answerSlice';
 
-function InputBox() {
+function InputBox({onAsk}) {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [message, setMessage] = useState('');
 
-    const [executeQuery, setExecuteQuery] = useState(false);
-    const [executeQueryGoogle, setExecuteQueryGoogle] = useState(false);
-    const [queryMessage, setQueryMessage] = useState('');
-
-    const { refetch: refetchAnswer } = useFetchAnswerQuery(queryMessage, { skip: !executeQuery });
-    const { refetch: refetchGoogleAnswer } = useFetchGoogleAnswerQuery(queryMessage, { skip: !executeQueryGoogle });
+    const [triggerCozeAnswer] = answerApi.endpoints.fetchAnswer.useLazyQuery();
+    const [triggerGoogleAnswer] = answerApi.endpoints.fetchGoogleAnswer.useLazyQuery();
+    const [triggerGoogleMultipleModalAnswer] = answerApi.endpoints.fetchGoogleMultipleModalAnswer.useLazyQuery();
 
     const contentEditableRef = useRef(null);
 
     const [imageFile, setImageFile] = useState(null); // State to store the image file
-
-    useEffect(() => {
-        if (executeQuery) {
-            refetchAnswer().finally(() => setExecuteQuery(false));
-        }
-        if (executeQueryGoogle) {
-            refetchGoogleAnswer().finally(() => setExecuteQueryGoogle(false));
-        }
-    }, [executeQuery, executeQueryGoogle, refetchAnswer, refetchGoogleAnswer]);
+    const [imageParts, setImageParts] = useState([]); // State to store the image file
 
     const handleKeyDown = async (e) => {
+       
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleInput();
+            // handleInput();
             if (!message.trim()) {
                 setShowAlert(true);
                 setAlertMsg("输入框为空");
@@ -41,30 +31,72 @@ function InputBox() {
         }
     };
 
+
+    function fileToGenerativePart(path, mimeType) {
+        return {
+            inlineData: {
+                data: Buffer.from(fs.readFileSync(path)).toString("base64"),
+                mimeType
+            },
+        };
+    }
+
+
     const ask = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setQueryMessage(message);
-        setExecuteQueryGoogle(true);
+        if (onAsk != null ) {
+            onAsk();
+        }
+        if(imageParts.length != 0) {
+            triggerGoogleMultipleModalAnswer([message,...imageParts]);
+        }
+        else {
+            triggerGoogleAnswer(message);
+        }
     };
 
     const handleDrop = (e) => {
         e.preventDefault();
         const items = e.dataTransfer.items;
+        const imageParts = []; // Initialize an empty array to store the image parts
+
         for (let i = 0; i < items.length; i++) {
             if (items[i].kind === 'file') {
                 const file = items[i].getAsFile();
-                setImageFile(file);
+                setImageFile(file); // Assuming setImageFile is a state setter
+                // console.log("imageFile", file);
+
+                // Create a FileReader to convert the file to a base64 string
                 const reader = new FileReader();
                 reader.onload = (event) => {
+                    // Create the inlineData object for the file
+                    const inlineData = {
+                        data: event.target.result.split(',')[1], // Remove the Data URL prefix and get the base64 data
+                        mimeType: file.type // Get the MIME type from the file object
+                    };
+
+                    // Create the generative part object for the file
+                    const generativePart = {
+                        inlineData: inlineData
+                    };
+
+                    // Add the generative part object to the imageParts array
+                    imageParts.push(generativePart);
+
+                    // Display the image in the UI
                     const img = document.createElement('img');
                     img.src = event.target.result;
                     img.style.maxWidth = '120px';
                     img.style.height = '120px';
                     document.getElementById('editable').appendChild(img);
                 };
-                reader.readAsDataURL(file);
+
+                reader.readAsDataURL(file); // Read the file as a Data URL (base64)
             }
         }
+
+        // After all files have been processed, you can use the imageParts array as needed
+        setImageParts(imageParts);
+        // If you need to set the imageParts as state, make sure to define a state setter and call it here
     };
 
     const handleDragOver = (e) => {
@@ -109,18 +141,13 @@ function InputBox() {
                         range.deleteContents(); // Delete any selected text
                         range.insertNode(document.createTextNode(text)); // Insert the plain text
                         range.collapse(false);
+                        setMessage(text);
                     }
                 });
             }
         }
     };
 
-
-
-    // const handleInput = (e) => {
-    //     const html = contentEditableRef.current.innerHTML;
-    //     setMessage(html);
-    // };
 
     const handleInput = (e) => {
         const html = contentEditableRef.current.innerHTML;
@@ -130,32 +157,39 @@ function InputBox() {
 
         // Extract and handle images
         const images = tempDiv.querySelectorAll('img');
-        const imageSrcs = [];
+        const inlineImages = [];
         images.forEach((img) => {
-            imageSrcs.push(img.src);
+            const srcData = img.src.split(','); // Split the data URL to separate the MIME type and base64 data
+            if (srcData.length === 2) {
+                const mimeType = srcData[0].match(/:(.*?);/)[1]; // Extract MIME type using regex
+                const base64Data = srcData[1]; // Get the base64 data part
+                const inlineData = {
+                    data: base64Data,
+                    mimeType: mimeType
+                };
+                // Create the generative part object for the image
+                const generativePart = {
+                    inlineData: inlineData
+                };
+                // Add the generative part object to the inlineImages array
+                inlineImages.push(generativePart);
+            }
             // Remove the image from the temporary container after processing
             img.parentNode.removeChild(img);
         });
 
-        // Do something with the extracted image URLs
-        // For example, you could update the state with the URLs or upload the images to a server
-        if (imageSrcs)
-            console.log(imageSrcs);
+        // // Do something with the extracted image URLs
+        // if (inlineImages.length !== 0)
+        //     console.log(inlineImages);
 
         // The remaining content in the temporary container is the text
         const textContent = tempDiv.textContent || tempDiv.innerText;
 
-        // Update the state with the text content
+        // Update the state with the text content and the image parts
         setMessage(textContent);
-
-        // If you want to store the HTML content including images, you can also update the state with the full HTML
-        // setMessage(html);
-
-        // If you need to perform additional actions with the text and images, you can do so here
-        // For example:
-        // uploadImages(imageSrcs);
-        // processText(textContent);
+        setImageParts(inlineImages); // Assuming setImageParts is a function that updates your state
     };
+
 
     // Example function to upload images (implementation depends on your backend)
     const uploadImages = (imageSrcs) => {
@@ -174,7 +208,7 @@ function InputBox() {
     return (
         <>
             <div className='flex items-center justify-center'>
-                <AlertComponent message={alertMsg} isVisible={showAlert} />
+                <AlertComponent message={alertMsg} isVisible={showAlert} onDismiss={() => setShowAlert(false)} />
             </div>
             <div className='mt-4'>
                 <div

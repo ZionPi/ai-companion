@@ -1,46 +1,49 @@
 {
     "service_url": "http://127.0.0.1:7077/v1/chat/completions",
     "secret_key": " ",
-    "active_provider": "Google",
-    "llms": [
-        {
-            "provider": "Google",
-            "service_url": "",
-            "api_key": "",
-            "active_model":"",
-            "model_list": [
-                "gemini-1.5-pro-latest",
-                "gemini-pro"
-            ]
-        },
-        {
-            "provider": "Coze",
-            "service_url": "http://127.0.0.1:7077/v1/chat/completions",
-            "api_key": "",
-            "active_model":"",  
-            "model_list": []
-        },
-        {
-            "provider": "OpenAI",
-            "service_url": "",
-            "api_key": "",
-            "active_model":"",
-            "model_list": [
-                "gpt3.5",
-                "gpt4"
-            ]
-        }
-    ],
-    "mode":"single",
-    "warning_number":90,
+    "llms": {
+        "active_provider": "Google",
+        "provider_list": [
+            {
+                "provider": "Google",
+                "service_url": "",
+                "api_key": "",
+                "active_model": "",
+                "model_list": [
+                    "gemini-1.5-pro-latest",
+                    "gemini-pro"
+                ],
+                "model_img_url": "https://cdn.pixabay.com/photo/2020/10/23/17/52/fox-5679446_1280.png"
+            },
+            {
+                "provider": "Coze",
+                "service_url": "http://127.0.0.1:7077/v1/chat/completions",
+                "api_key": "",
+                "active_model": "",
+                "model_list": [],
+                "model_img_url": "https://cdn.pixabay.com/photo/2016/03/31/20/31/amazed-1295833_960_720.png"
+            },
+            {
+                "provider": "OpenAI",
+                "service_url": "",
+                "api_key": "",
+                "active_model": "",
+                "model_list": [
+                    "gpt3.5",
+                    "gpt4"
+                ],
+                "model_img_url": "https://cdn.pixabay.com/photo/2015/01/17/21/50/insect-602547_1280.png"
+            }
+        ]
+    },
+    "mode": "single",
+    "warning_number": 90,
     "config_key": "service_config",
     "message_list_key": "message_list",
     "user_name": "momo",
     "user_img_url": "https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_960_720.png",
-    "model_name" : "coze",
-    "model_img_url": "https://cdn.pixabay.com/photo/2016/03/31/20/31/amazed-1295833_960_720.png",
 
-    "chat_mode" : {
+    "chat_mode": {
         "lead_clause": "AI Companion",
         "is_online": " online "
     }

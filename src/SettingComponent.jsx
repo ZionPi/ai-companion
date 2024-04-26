@@ -77,8 +77,7 @@ const exportLocalStorage = () => {
 };
 
     return (
-        <div className="w-full">
-
+        <div className="w-full" >
 
             <div className="flex items-center justify-center p-12">
 

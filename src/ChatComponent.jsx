@@ -3,8 +3,8 @@ import InputBox from './InputBox';
 // import { MessageListContext } from './MessageListContext';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import colorsData from './data/colors.json';
+import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 function ChatComponent() {
@@ -20,6 +20,7 @@ function ChatComponent() {
         fixedWidth: true, // Set to true if your list's width is fixed
         defaultHeight: 100, // Provide a default height for the cells
     });
+
 
 
 
@@ -65,11 +66,11 @@ function ChatComponent() {
             }}
             overscanRowCount={2} // How many rows to render above/below the visible area
         />
-    ), [messageList.length]);
+    ), [messageList,messageList.length]);
 
     const configData = useSelector(state => state.config.config);
 
-    let scrollTimeout;
+   
 
     // // Detect scroll position and show/hide button accordingly
     // useEffect(() => {
@@ -102,6 +103,7 @@ function ChatComponent() {
     // }, [scrollableContainerRef]); // Empty dependency array ensures this effect runs only once after the initial render
 
 
+    let scrollTimeout;
 
     const scrollToTop = () => {
         // Using the 'scrollToRow' method of the List to scroll to the top
@@ -129,6 +131,14 @@ function ChatComponent() {
             setShowScrollButton(false);
         }, 2000);
     };
+
+
+    const onAsk = () => {
+        if (listRef.current) {
+            const totalHeight = listRef.current.getOffsetForRow({ index: messageList.length - 1 });
+            listRef.current.scrollToPosition(totalHeight);
+        }
+    }
 
 
     // Cleanup timeout on component unmount
@@ -164,7 +174,7 @@ function ChatComponent() {
             </div>
 
 
-            <InputBox ></InputBox>
+            <InputBox onAsk = {onAsk}></InputBox>
 
             {showScrollButton && (
                 <button

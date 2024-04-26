@@ -11,6 +11,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^4.30.10",
+    "@clerk/themes": "^1.7.12",
     "@google/generative-ai": "^0.5.0",
     "@redux-devtools/extension": "^3.3.0",
     "@reduxjs/toolkit": "^2.2.2",
