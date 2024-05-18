@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import "./index.css";
 import AlertComponent from './AlertComponent';
 import { answerApi} from './redux/slice/answerSlice';
+import { useSelector } from 'react-redux';
 
 function InputBox({onAsk}) {
     const [showAlert, setShowAlert] = useState(false);
@@ -11,6 +12,10 @@ function InputBox({onAsk}) {
     const [triggerCozeAnswer] = answerApi.endpoints.fetchAnswer.useLazyQuery();
     const [triggerGoogleAnswer] = answerApi.endpoints.fetchGoogleAnswer.useLazyQuery();
     const [triggerGoogleMultipleModalAnswer] = answerApi.endpoints.fetchGoogleMultipleModalAnswer.useLazyQuery();
+
+    const configData = useSelector(state => state.config.config);
+
+    const active_provider_name = configData.llms.active_provider;
 
     const contentEditableRef = useRef(null);
 
@@ -43,6 +48,7 @@ function InputBox({onAsk}) {
 
 
     const ask = () => {
+
         if (onAsk != null ) {
             onAsk();
         }
@@ -50,7 +56,11 @@ function InputBox({onAsk}) {
             triggerGoogleMultipleModalAnswer([message,...imageParts]);
         }
         else {
-            triggerGoogleAnswer(message);
+            if(active_provider_name === "Coze") {
+                triggerCozeAnswer(message);
+            } else if(active_provider_name === "Google") {
+                triggerGoogleAnswer(message);
+            }
         }
     };
 

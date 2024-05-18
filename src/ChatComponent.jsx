@@ -6,11 +6,12 @@ import { useSelector } from 'react-redux';
 import colorsData from './data/colors.json';
 import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import AutoSizer from 'react-virtualized-auto-sizer';
-
 function ChatComponent() {
     const [showScrollButton, setShowScrollButton] = useState(false);
 
     const messageList = useSelector(state => state.messages.messageList);
+
+    const configData = useSelector(state => state.config.config);
 
     const scrollableContainerRef = useRef(null);
 
@@ -68,7 +69,7 @@ function ChatComponent() {
         />
     ), [messageList,messageList.length]);
 
-    const configData = useSelector(state => state.config.config);
+  
 
    
 
@@ -161,8 +162,6 @@ function ChatComponent() {
             <div className="flex items-center mb-4">
                 <div className="ml-3">
                     <p className="text-xl font-medium">{configData.chat_mode.lead_clause}</p>
-                    {/* <OnlineStatusIndicator />  */}
-                    {/* <p className="text-gray-500">{configData.chat_mode.is_online}</p> */}
                 </div>
             </div>
 

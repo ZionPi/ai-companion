@@ -5,6 +5,7 @@ import { saveConfig } from './redux/slice/configSlice'; // Update the path to th
 import configDataDefault from './data/config.json';
 import { display, generate } from "facesjs";
 import LLMConfig from "./LLMConfig";
+import {supabase} from './redux/slice/supabaseClient'
 
 function SettingComponent() {
 
@@ -22,7 +23,8 @@ function SettingComponent() {
 
     const [mode, setMode] = useState(configData.mode);
 
- 
+    const [countries, setCountries] = useState([]);
+
 
     useEffect(() => {
         const face = generate();
@@ -48,6 +50,17 @@ function SettingComponent() {
 
         dispatch(saveConfig(updatedConfigData));
     };
+
+
+    async function getCountries() {
+        const { data } = await supabase.from("countries").select();
+        setCountries(data);
+        console.log("data", data);
+    }
+
+    const test_supabase = () => {
+        getCountries();
+    }
 
     const reset_config = () => {
         setServerAddress(configDataDefault.service_url);
@@ -309,6 +322,24 @@ const exportLocalStorage = () => {
                         </div>
 
 
+                        <div className="mb-5">
+
+                            <button
+                                className={`hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
+                                onClick={test_supabase}
+                            >
+                                测试
+                            </button>
+
+                            <ul>
+                                {countries.map((country) => (
+                                    <li key={country.name}>{country.name}</li>
+                                ))}
+                            </ul>
+
+                        </div>
+
+
                         <div className="-mx-3 flex flex-wrap hidden">
                             <div className="w-full px-3 sm:w-1/2">
                                 <div className="mb-5">
@@ -348,12 +379,12 @@ const exportLocalStorage = () => {
 
                         <div className="flex justify-end ">
 
-  <button
-    className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
-    onClick={exportLocalStorage}
-  >
-    导出历史
-  </button>
+                            <button
+                                className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
+                                onClick={exportLocalStorage}
+                            >
+                                导出历史
+                            </button>
 
                             <button
                                 className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}

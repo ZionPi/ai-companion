@@ -165,9 +165,8 @@ async function processMessage(message, dispatch, systemModelName) {
             }
 
         } else if(systemModelName === "coze") {
-     
 
-          const response = await fetch(config.service_url, {
+          const response = await fetch(active_provider.service_url, {
               method: 'POST',
               body: JSON.stringify({
                 model: 'gpt-4',
@@ -196,9 +195,9 @@ async function processMessage(message, dispatch, systemModelName) {
                 }
                 try {
                   const json = JSON.parse(c);
-                  if (config.service_url.includes("8080")) {
+                  if (active_provider.service_url.includes("8080")) {
                     content += json.choices[0].delta.content;
-                  } else if (config.service_url.includes("7077")) {
+                  } else if (active_provider.service_url.includes("7077")) {
                     content = json.choices[0].message.content;
                   }
 
@@ -235,12 +234,12 @@ async function processMessage(message, dispatch, systemModelName) {
 
 export const answerApi = createApi({
   reducerPath: 'answerApi',
-  baseQuery: fetchBaseQuery({ baseUrl: config.service_url }),
+  baseQuery: fetchBaseQuery({ baseUrl: active_provider.service_url }),
   endpoints: (builder) => ({
 
     fetchAnswer: builder.query({
       queryFn: async (message, { dispatch }) => {
-        await processMessage(message, dispatch, config.model_name);
+        await processMessage(message, dispatch, "coze");
       },
     }),
 
