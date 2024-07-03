@@ -3,7 +3,8 @@ import { setContent } from './contentSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { updateMessageList, updateSingleItem } from './messageListSlice';
 import configData from '../../data/config.json';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI,HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+
 import { createSlice } from '@reduxjs/toolkit';
 
 
@@ -92,23 +93,26 @@ async function processMessage(message, dispatch, systemModelName) {
       const safetySettings = [
         {
           category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
         },
         {
           category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
         },
         {
           category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
         },
         {
           category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
         }
       ];
 
       try {
+
+        console.log('message is :', message);
+
         // Different behavior depending on whether it's Google API or not
         if (systemModelName === "gemini-1.5-pro-latest") {
 
@@ -116,7 +120,11 @@ async function processMessage(message, dispatch, systemModelName) {
               apiVersion: 'v1beta',
             });
 
-            const result = await model.generateContentStream(prompt);
+            const result = await model.generateContentStream(message);
+
+            // const chat =  model.startChat()
+
+            // const result = await chat.generateContentStream(message)
 
             for await (const chunk of result.stream) {
 
@@ -137,7 +145,7 @@ async function processMessage(message, dispatch, systemModelName) {
               }
             }
 
-        } else if(systemModelName === "gemini-pro-vision") {
+        } else if(systemModelName === "gemini-1.5-flash") {
 
             const model = genAI.getGenerativeModel({ model: systemModelName, safetySettings }, {
               apiVersion: 'v1beta',
@@ -252,7 +260,7 @@ export const answerApi = createApi({
 
     fetchGoogleMultipleModalAnswer: builder.query({
       queryFn: async (message, { dispatch }) => {
-        const google_model = "gemini-pro-vision";
+        const google_model = "gemini-1.5-pro-latest";
         await processMessage(message, dispatch, google_model);
       },
     }),

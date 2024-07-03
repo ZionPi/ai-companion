@@ -24,6 +24,17 @@ function ChatComponent() {
 
 
 
+    useEffect(() => {
+        if (listRef.current) {
+            // Invalidate the cache to ensure measurements are updated
+            cache.clearAll();
+            listRef.current.recomputeRowHeights();
+            // Scroll to the last item
+            const lastIndex = messageList.length - 1;
+            listRef.current.scrollToRow(lastIndex);
+        }
+    }, [messageList.length]); // Trigger this effect whenever the length of messageList changes
+
 
     // The Row component that will be rendered for each item in the list
     const Row = ({ index, key, parent, style }) => (
@@ -67,11 +78,11 @@ function ChatComponent() {
             }}
             overscanRowCount={2} // How many rows to render above/below the visible area
         />
-    ), [messageList,messageList.length]);
+    ), [messageList, messageList.length]);
 
-  
 
-   
+
+
 
     // // Detect scroll position and show/hide button accordingly
     // useEffect(() => {
@@ -114,33 +125,52 @@ function ChatComponent() {
     };
 
     const scrollToBottom = () => {
-        // Assuming 'data' is the array of items you're rendering in the List
+        // Invalidate the entire cache to recalculate cell sizes
+        cache.clearAll();
+        // Force the List to re-render by updating a state that it depends on
         const lastIndex = messageList.length - 1;
+        setLastIndexToScroll(lastIndex);
+        // // Assuming 'data' is the array of items you're rendering in the List
+        // const lastIndex = messageList.length - 1;
 
-        // Using the 'scrollToRow' method of the List to scroll to the bottom
-        if (listRef.current) {
-            listRef.current.scrollToRow(lastIndex);
-        }
+        // // Using the 'scrollToRow' method of the List to scroll to the bottom
+        // if (listRef.current) {
+        //     listRef.current.scrollToRow(lastIndex);
+        // }
 
-        // Clear any existing timeout
-        if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-        }
+        // // Clear any existing timeout
+        // if (scrollTimeout) {
+        //     clearTimeout(scrollTimeout);
+        // }
 
-        // Hide the scroll button after 2 seconds
-        scrollTimeout = setTimeout(() => {
-            setShowScrollButton(false);
-        }, 2000);
+        // // Hide the scroll button after 2 seconds
+        // scrollTimeout = setTimeout(() => {
+        //     setShowScrollButton(false);
+        // }, 2000);
     };
 
 
     const onAsk = () => {
-        if (listRef.current) {
-            const totalHeight = listRef.current.getOffsetForRow({ index: messageList.length - 1 });
-            listRef.current.scrollToPosition(totalHeight);
-        }
+        // Invalidate the entire cache to recalculate cell sizes
+        cache.clearAll();
+        // Force the List to re-render by updating a state that it depends on
+        const lastIndex = messageList.length - 1;
+        setLastIndexToScroll(lastIndex);
     }
 
+    // State to trigger re-render
+    const [lastIndexToScroll, setLastIndexToScroll] = useState(null);
+
+    useEffect(() => {
+        if (lastIndexToScroll !== null && listRef.current) {
+            // Delay the scroll slightly to ensure all updates have been processed
+            setTimeout(() => {
+                listRef.current.recomputeRowHeights();
+                listRef.current.scrollToRow(lastIndexToScroll);
+                setLastIndexToScroll(null); // Reset to null after scrolling
+            }, 300); // Adjust delay as needed
+        }
+    }, [lastIndexToScroll, messageList.length]); // Depend on lastIndexToScroll and messageList.length to trigger effect
 
     // Cleanup timeout on component unmount
     useEffect(() => {
@@ -173,7 +203,7 @@ function ChatComponent() {
             </div>
 
 
-            <InputBox onAsk = {onAsk}></InputBox>
+            <InputBox onAsk={onAsk}></InputBox>
 
             {showScrollButton && (
                 <button
