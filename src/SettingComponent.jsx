@@ -5,7 +5,7 @@ import { saveConfig } from './redux/slice/configSlice'; // Update the path to th
 import configDataDefault from './data/config.json';
 import { display, generate } from "facesjs";
 import LLMConfig from "./LLMConfig";
-import {supabase} from './redux/slice/supabaseClient'
+// import {supabase} from './redux/slice/supabaseClient'
 
 function SettingComponent() {
 
@@ -52,15 +52,15 @@ function SettingComponent() {
     };
 
 
-    async function getCountries() {
-        const { data } = await supabase.from("countries").select();
-        setCountries(data);
-        console.log("data", data);
-    }
+    // async function getCountries() {
+    //     const { data } = await supabase.from("countries").select();
+    //     setCountries(data);
+    //     console.log("data", data);
+    // }
 
-    const test_supabase = () => {
-        getCountries();
-    }
+    // const test_supabase = () => {
+    //     getCountries();
+    // }
 
     const reset_config = () => {
         setServerAddress(configDataDefault.service_url);
