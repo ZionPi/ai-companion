@@ -17,3 +17,4 @@ src/read_helper.js
 uploads/*
 node_modules/*
 
+.vercel

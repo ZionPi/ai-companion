@@ -324,12 +324,12 @@ const exportLocalStorage = () => {
 
                         <div className="mb-5">
 
-                            <button
+                            {/* <button
                                 className={`hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
                                 onClick={test_supabase}
                             >
                                 测试
-                            </button>
+                            </button> */}
 
                             <ul>
                                 {countries.map((country) => (
