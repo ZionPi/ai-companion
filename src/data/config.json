@@ -8,8 +8,12 @@
                 "api_key": "",
                 "active_model": "",
                 "model_list": [
+                    "gemini-1.5-pro-exp-0801",
                     "gemini-1.5-pro-latest",
-                    "gemini-pro"
+                    "gemini-1.5-flash-latest",
+                    "gemini-1.0-pro",
+                    "text-embedding-004",
+                    "aqa"
                 ],
                 "model_img_url": "https://cdn.pixabay.com/photo/2020/10/23/17/52/fox-5679446_1280.png"
             },
@@ -44,6 +48,31 @@
         "lead_clause": "AI Companion",
         "is_online": " online "
     },
-    "quote":"Free software is not free beer. It is a matter of liberty ,not price."
-
+    "quote": "Free software is not free beer. It is a matter of liberty ,not price.",
+    "prompt": {
+        "image": {
+            "active": 0,
+            "list": [
+                "告诉我你看到的，尽可能多说点，越详细越好，请用中文回答我，当你想用英文回答我的时候，试着把它翻译成中文后返回给我,仅仅返回中文，尽你所能，你是最棒的"
+            ]
+        },
+        "audio": {
+            "active": 0,
+            "list": [
+                "简要概括下该音频的内容，用中文返回。"
+            ]
+        },
+        "summary": {
+            "active": 0,
+            "list": [
+                "请首先中文输出文本的所有内容，然后简洁准确地总结文本，并用中文返回结果："
+            ]
+        },
+        "translate": {
+            "active": 0,
+            "list": [
+                "帮我把上文翻译成中文，超链接部分直接返回，尽你所能保留原文格式。 仅返回译文"
+            ]
+        }
+    }
 }

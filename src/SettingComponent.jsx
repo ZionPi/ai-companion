@@ -89,6 +89,11 @@ const exportLocalStorage = () => {
   document.body.removeChild(downloadAnchor);
 };
 
+
+const deleteLocalStorage = () => {
+    localStorage.clear();
+}
+
     return (
         <div className="w-full" >
 
@@ -384,6 +389,13 @@ const exportLocalStorage = () => {
                                 onClick={exportLocalStorage}
                             >
                                 导出历史
+                            </button>
+
+                            <button
+                                className={`mr-5 hover:shadow-form rounded-md bg-[${colorsData.bg_color}] py-3 px-8 text-center text-base font-semibold text-white outline-none`}
+                                onClick={deleteLocalStorage}
+                            >
+                                删除历史
                             </button>
 
                             <button

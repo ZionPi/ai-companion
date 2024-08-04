@@ -26,6 +26,14 @@ function InputBox({ onAsk }) {
     const [embeddedContentSources, setEmbeddedContentSources] = useState(new Set());
 
 
+    useEffect(() => {
+        const html = contentEditableRef.current.innerHTML;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const textContent = tempDiv.textContent || tempDiv.innerText;
+        setMessage(textContent);
+    }, [contentEditableRef.current?.innerHTML]);
+
     const handleKeyDown = async (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -56,12 +64,12 @@ function InputBox({ onAsk }) {
         };
     }
 
-
-    const ask = () => {
+    const ask = async () => {
 
         if (onAsk != null) {
             onAsk();
         }
+
         if (fileParts.length != 0) {
             triggerGoogleMultipleModalAnswer([message, ...fileParts]);
         }
@@ -265,8 +273,8 @@ function InputBox({ onAsk }) {
                         range.deleteContents(); // Delete any selected text
                         range.insertNode(document.createTextNode(text)); // Insert the plain text
                         range.collapse(false);
-                        setMessage(text);
                     }
+                    setMessage(text);
                 });
             }
         }

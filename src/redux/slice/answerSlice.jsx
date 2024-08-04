@@ -3,7 +3,7 @@ import { setContent } from './contentSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { updateMessageList, updateSingleItem } from './messageListSlice';
 import configData from '../../data/config.json';
-import { GoogleGenerativeAI,HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -19,22 +19,34 @@ let active_provider = config.llms.provider_list.find((t) => t.provider == active
 let genAI = new GoogleGenerativeAI(config.llms.provider_list.find((t) => t.provider == "Google").api_key);
 
 
+const initialState = {
+  activeProvider: config.llms.active_provider,
+  providers: config.llms.provider_list,
+  apiKey: config.llms.provider_list.find(p => p.provider === "Google")?.api_key
+};
 // Define the slice
 
 export const genAISlice = createSlice({
   name: 'genAI',
-  initialState: { apiKey: config.llms.provider_list.find((t) => t.provider == "Google").api_key },
+  initialState,
   reducers: {
     updateApiKey: (state, action) => {
       state.apiKey = action.payload; // is it necessary to try here?
       genAI = new GoogleGenerativeAI(state.apiKey);
     },
 
-    updateActiveProvider: (state,action) => {
-
-      if(state.payload) {
+    updateActiveProvider: (state, action) => {
+      if (state.payload) {
         active_provider_name = action.payload;
         active_provider = config.llms.provider_list.find((t) => t.provider == active_provider_name);
+      }
+    },
+
+    updateActiveModel: (state, action) => {
+      const { provider, model } = action.payload;
+      const providerIndex = state.providers.findIndex(p => p.provider === provider);
+      if (providerIndex !== -1) {
+        state.providers[providerIndex].active_model = model;
       }
     }
   },
@@ -42,9 +54,7 @@ export const genAISlice = createSlice({
 
 const { actions, genAIReducer } = genAISlice
 
-export const { updateApiKey,updateActiveProvider } = actions;
-
-
+export const { updateApiKey, updateActiveProvider, updateActiveModel } = actions;
 
 
 function getMsg(_id, role, name, msg, img, isloading) {
@@ -61,7 +71,22 @@ function getMsg(_id, role, name, msg, img, isloading) {
 }
 
 
+// Function to fetch content from a URL
+async function fetchUrlContent(url) {
+  try {
+    const response = await fetch("https://r.jina.ai/" + url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch content from ${url}`);
+    }
+    return await response.text(); // Or response.json() if you expect JSON
+  } catch (error) {
+    console.error(error);
+    return null; // Or handle the error differently
+  }
+}
+
 async function processMessage(message, dispatch, systemModelName) {
+
   return new Promise(async (resolve, reject) => {
     try {
       let prompt = ""
@@ -73,6 +98,25 @@ async function processMessage(message, dispatch, systemModelName) {
       }
       else {
 
+      }
+
+      // Check if message starts with a URL
+      const urlRegex = /^(https?:\/\/[^\s]+)/;
+      const match = prompt.trim().match(urlRegex);
+      if (match) {
+        const url = match[1];
+        dispatch(setContent({ isLoading: true, value: "" }));
+        const content = await fetchUrlContent(url);
+        if (content) {
+          const ai = configData.prompt.summary.active;//active index
+          const p = configData.prompt.summary.list[ai];//active prompt
+          message = p + content;
+          // console.log(message);
+        } else {
+          console.error(`Failed to fetch content from ${url}`);
+          // Optionally, you can show an error message to the user here
+          return; // Stop further processing
+        }
       }
 
       const user_msg_id = generateUniqueId();
@@ -110,113 +154,85 @@ async function processMessage(message, dispatch, systemModelName) {
       ];
 
       try {
-
-        console.log('message is :', message);
-
         // Different behavior depending on whether it's Google API or not
-        if (systemModelName === "gemini-1.5-pro-latest") {
-
-            const model = genAI.getGenerativeModel({ model: systemModelName, safetySettings }, {
-              apiVersion: 'v1beta',
-            });
-
-            const result = await model.generateContentStream(message);
-
-            // const chat =  model.startChat()
-
-            // const result = await chat.generateContentStream(message)
-
-            for await (const chunk of result.stream) {
-
-              try {
-                const chunkText = chunk.text();
-                content += chunkText;
-
-                dispatch(setContent({ isLoading: true, value: content }));
-
-                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: true }));
-
-              } catch (error) {
-                //if something is wrong,notify to ui.
-                dispatch(setContent({ isLoading: false, value: content }));
-                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: false }));
-                console.log("error", error);
-                reject(error);
-              }
-            }
-
-        } else if(systemModelName === "gemini-1.5-flash") {
-
-            const model = genAI.getGenerativeModel({ model: systemModelName, safetySettings }, {
-              apiVersion: 'v1beta',
-            });
-
-            const result = await model.generateContentStream(message);
-
-            for await (const chunk of result.stream) {
-
-              try {
-                const chunkText = chunk.text();
-                content += chunkText;
-
-                dispatch(setContent({ isLoading: true, value: content }));
-
-                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: true }));
-
-              } catch (error) {
-                //if something is wrong,notify to ui.
-                dispatch(setContent({ isLoading: false, value: content }));
-                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: false }));
-                console.log("error", error);
-                reject(error);
-              }
-            }
-
-        } else if(systemModelName === "coze") {
-
+        if (systemModelName === "coze") {
           const response = await fetch(active_provider.service_url, {
-              method: 'POST',
-              body: JSON.stringify({
-                model: 'gpt-4',
-                stream: true,
-                messages: [
-                  {
-                    content: prompt,
-                    role: 'user'
-                  }
-                ]
-              }),
-            });
-            const reader = response.body.getReader();
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              const rawJsonString = new TextDecoder().decode(value);
-              const dataStringList = rawJsonString.split("data:");//this is may not be correct if the response has the data: 
-              for (let i = 1; i < dataStringList.length; i++) {
-                const c = dataStringList[i];
-                if (c.trim() === '[DONE]') {
-                  dispatch(setContent({ isLoading: false, value: content }));
-                  dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: false }));
-                  break;
+            method: 'POST',
+            body: JSON.stringify({
+              model: 'gpt-4',
+              stream: true,
+              messages: [
+                {
+                  content: prompt,
+                  role: 'user'
                 }
-                try {
-                  const json = JSON.parse(c);
-                  if (active_provider.service_url.includes("8080")) {
-                    content += json.choices[0].delta.content;
-                  } else if (active_provider.service_url.includes("7077")) {
-                    content = json.choices[0].message.content;
-                  }
+              ]
+            }),
+          });
+          const reader = response.body.getReader();
 
-                  dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: true }));
-                  dispatch(setContent({ isLoading: true, value: content }));
-                } catch (e) {
-                  console.log('Error parsing JSON:', c, rawJsonString);
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const rawJsonString = new TextDecoder().decode(value);
+            const dataStringList = rawJsonString.split("data:");//this is may not be correct if the response has the data: 
+            for (let i = 1; i < dataStringList.length; i++) {
+              const c = dataStringList[i];
+              if (c.trim() === '[DONE]') {
+                dispatch(setContent({ isLoading: false, value: content }));
+                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: false }));
+                break;
+              }
+              try {
+                const json = JSON.parse(c);
+                if (active_provider.service_url.includes("8080")) {
+                  content += json.choices[0].delta.content;
+                } else if (active_provider.service_url.includes("7077")) {
+                  content = json.choices[0].message.content;
                 }
+
+                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: true }));
+                dispatch(setContent({ isLoading: true, value: content }));
+              } catch (e) {
+                console.log('Error parsing JSON:', c, rawJsonString);
               }
             }
-            resolve({ data: {} }); // resolve the Promise when done processing the response
+          }
+          resolve({ data: {} }); // resolve the Promise when done processing the response
+        } else {
+          try {
+
+            const model = genAI.getGenerativeModel({ model: systemModelName, safetySettings }, {
+              apiVersion: 'v1beta',
+            });
+
+            console.log(message);
+
+            const result = await model.generateContentStream(message);
+
+            for await (const chunk of result.stream) {
+              try {
+                const chunkText = chunk.text();
+                content += chunkText;
+
+                dispatch(setContent({ isLoading: true, value: content }));
+
+                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: true }));
+
+              } catch (error) {
+                //if something is wrong,notify to ui.
+                dispatch(setContent({ isLoading: false, value: content }));
+                dispatch(updateSingleItem({ id: system_msg_id, desc: content, isLoading: false }));
+                console.log("error", error);
+                reject(error);
+              }
+            }
+
+          } catch (error) {
+            //if something is wrong,notify to ui.
+            dispatch(setContent({ isLoading: false, value: error.toString() }));
+            reject(error);
+          }
         }
       } catch (apiError) {
         // Handle API specific errors here
@@ -247,21 +263,26 @@ export const answerApi = createApi({
 
     fetchAnswer: builder.query({
       queryFn: async (message, { dispatch }) => {
+
         await processMessage(message, dispatch, "coze");
       },
     }),
 
     fetchGoogleAnswer: builder.query({
-      queryFn: async (message, { dispatch }) => {
-        const google_model = "gemini-1.5-pro-latest";
-        await processMessage(message, dispatch, google_model);
+      queryFn: async (message, { dispatch, getState }) => {
+        const state = getState();
+        const googleProvider = state.genAI.providers.find(p => p.provider === "Google");
+        const activeModel = googleProvider ? googleProvider.active_model : null;
+        await processMessage(message, dispatch, activeModel);
       },
     }),
 
     fetchGoogleMultipleModalAnswer: builder.query({
-      queryFn: async (message, { dispatch }) => {
-        const google_model = "gemini-1.5-pro-latest";
-        await processMessage(message, dispatch, google_model);
+      queryFn: async (message, { dispatch, getState }) => {
+        const state = getState();
+        const googleProvider = state.genAI.providers.find(p => p.provider === "Google");
+        const activeModel = googleProvider ? googleProvider.active_model : null;
+        await processMessage(message, dispatch, activeModel);
       },
     }),
 
